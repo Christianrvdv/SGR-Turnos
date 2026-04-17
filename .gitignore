@@ -18,3 +18,28 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+# Entornos (si no quieres commitear ningún .env)
+.env
+.env.test
+.env.prod
+
+# Archivos de caché y logs de PHPUnit
+.phpunit.result.cache
+
+# Archivos de sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Directorios y archivos de IDEs (PhpStorm, VSCode, etc.)
+/.idea/
+/.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Archivos de composer (opcional, si quieres ignorar el lock en librerías)
+# composer.lock   # Descomenta solo si estás desarrollando una librería reusable
