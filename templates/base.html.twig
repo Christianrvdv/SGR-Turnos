@@ -1,76 +1,44 @@
 <!DOCTYPE html>
-<html lang="es">
+<html class="light" lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}SGR-Turnos{% endblock %}</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>🏦</text></svg>">
 
-    {# Tailwind CSS vía AssetMapper #}
+    <!-- Fuentes (Google Fonts - opcional, también puedes descargarlas) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <!-- AssetMapper: CSS compilado localmente (Tailwind + estilos) -->
     {% block stylesheets %}
-        <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+        {{ asset('styles/app.css') }}
     {% endblock %}
 
-    {# JavaScript #}
-    {% block javascripts %}
-        {{ importmap('app') }}
-    {% endblock %}
-
-    {# Hot Reload para FrankenPHP (desarrollo) #}
-    {% set frankenphpHotReload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
-    {% if frankenphpHotReload %}
-        <meta name="frankenphp-hot-reload:url" content="{{ frankenphpHotReload }}">
-        <script src="https://cdn.jsdelivr.net/npm/idiomorph"></script>
-        <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
-    {% endif %}
+    {% block javascripts %}{% endblock %}
 </head>
-<body class="bg-background-light font-sans antialiased">
-{# Contenedor de mensajes flash flotantes #}
-{% block flash_messages %}
-    {% for label, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="flash-messages-container fixed top-4 right-4 z-50 max-w-md w-full"
-                 data-controller="flash-message">
-                <div class="flash-message bg-white border-l-4 shadow-lg rounded-lg p-4 mb-2 animate-slide-in-from-top-2
-                                {% if label == 'success' %}border-success text-success
-                                {% elseif label == 'error' or label == 'danger' %}border-danger text-danger
-                                {% elseif label == 'warning' %}border-warning text-warning
-                                {% elseif label == 'info' %}border-info text-info
-                                {% else %}border-gray-500 text-gray-700{% endif %}">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">{{ message|raw }}</div>
-                        <button type="button" class="ml-4 text-gray-400 hover:text-gray-600" data-action="flash-message#close">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        {% endfor %}
-    {% endfor %}
-{% endblock %}
+<body class="bg-surface text-on-surface min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
 
-{# Contenido principal #}
-<main class="min-h-screen">
+<!-- Elementos de fondo ambientales -->
+<div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-surface-container-low rounded-full blur-3xl opacity-50"></div>
+    <div class="absolute bottom-[10%] -right-[10%] w-[60%] h-[60%] bg-surface-container rounded-full blur-3xl opacity-50"></div>
+</div>
+
+<!-- Contenido principal -->
+<main class="w-full max-w-md px-6 z-10">
     {% block body %}{% endblock %}
 </main>
 
-{# Script para auto-ocultar mensajes flash (opcional) #}
-{% block extra_javascript %}
-    <script>
-        // Auto-ocultar mensajes flash después de 5 segundos
-        document.addEventListener('DOMContentLoaded', () => {
-            const flashMessages = document.querySelectorAll('.flash-message');
-            flashMessages.forEach(message => {
-                setTimeout(() => {
-                    message.style.transition = 'opacity 0.3s ease-out';
-                    message.style.opacity = '0';
-                    setTimeout(() => message.remove(), 300);
-                }, 5000);
-            });
-        });
-    </script>
-{% endblock %}
+<!-- Footer -->
+<footer class="fixed bottom-0 w-full py-6 flex flex-col md:flex-row justify-center items-center gap-4 px-8 z-10 bg-transparent">
+    <p class="font-['Inter'] text-sm font-medium text-on-surface-variant">
+        © 2024 SGR-Turnos. Architectural Serenity.
+    </p>
+    <div class="flex gap-4">
+        <a class="font-['Inter'] text-sm font-medium text-[#424654] hover:text-[#0040a1] transition-opacity opacity-100 hover:opacity-80" href="#">Privacy</a>
+        <a class="font-['Inter'] text-sm font-medium text-[#424654] hover:text-[#0040a1] transition-opacity opacity-100 hover:opacity-80" href="#">Terms</a>
+        <a class="font-['Inter'] text-sm font-medium text-[#424654] hover:text-[#0040a1] transition-opacity opacity-100 hover:opacity-80" href="#">Support</a>
+    </div>
+</footer>
 </body>
 </html>

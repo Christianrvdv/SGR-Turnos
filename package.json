@@ -1,0 +1,42 @@
+{
+  "name": "sgr-turnos",
+  "version": "1.0.0",
+  "main": "tailwind.config.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Christianrvdv/SGR-Turnos.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Christianrvdv/SGR-Turnos/issues"
+  },
+  "homepage": "https://github.com/Christianrvdv/SGR-Turnos#readme",
+  "devDependencies": {
+    "autoprefixer": "^10.5.0",
+    "postcss": "^8.5.10",
+    "tailwindcss": "^3.4.19"
+  },
+  "dependencies": {
+    "baseline-browser-mapping": "^2.10.19",
+    "browserslist": "^4.28.2",
+    "caniuse-lite": "^1.0.30001788",
+    "electron-to-chromium": "^1.5.340",
+    "escalade": "^3.2.0",
+    "fraction.js": "^5.3.4",
+    "nanoid": "^3.3.11",
+    "node-releases": "^2.0.37",
+    "picocolors": "^1.1.1",
+    "postcss-value-parser": "^4.2.0",
+    "source-map-js": "^1.2.1",
+    "update-browserslist-db": "^1.2.3"
+  },
+  "description": ""
+}
