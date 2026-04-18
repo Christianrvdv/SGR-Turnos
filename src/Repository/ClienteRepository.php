@@ -41,4 +41,42 @@ class ClienteRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['numeroIdentidad' => $numeroIdentidad]);
     }
+
+    /**
+     * Busca o crea un cliente por su número de tarjeta
+     */
+    public function findOrCreateByTarjeta(string $numeroTarjeta): Cliente
+    {
+        $cliente = $this->findOneBy(['numeroTarjeta' => $numeroTarjeta]);
+
+        if (!$cliente) {
+            $cliente = new Cliente();
+            $cliente->setNumeroTarjeta($numeroTarjeta);
+            // Opcional: marcar que falta el número de identidad
+            $this->getEntityManager()->persist($cliente);
+        }
+
+        return $cliente;
+    }
+
+    /**
+     * Busca cliente por tarjeta exacta
+     */
+    public function findByTarjeta(string $numeroTarjeta): ?Cliente
+    {
+        return $this->findOneBy(['numeroTarjeta' => $numeroTarjeta]);
+    }
+
+    /**
+     * Busca cliente por identidad o tarjeta (útil para un único campo de búsqueda genérico)
+     */
+    public function findByIdentidadOrTarjeta(string $identificador): ?Cliente
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.numeroIdentidad = :id OR c.numeroTarjeta = :id')
+            ->setParameter('id', $identificador)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

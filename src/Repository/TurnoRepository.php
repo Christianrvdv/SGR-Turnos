@@ -112,4 +112,21 @@ class TurnoRepository extends ServiceEntityRepository
         $numero = (int) $ultimo['numeroTurno'];
         return str_pad((string) ($numero + 1), 3, '0', STR_PAD_LEFT);
     }
+
+    /**
+     * Verifica si un cliente ya tiene un turno en una configuración diaria específica
+     */
+    public function existsTurnoForClienteInConfiguracion(Cliente $cliente, ConfiguracionDiaria $configuracion): bool
+    {
+        $result = $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->andWhere('t.cliente = :cliente')
+            ->andWhere('t.configuracionDiaria = :config')
+            ->setParameter('cliente', $cliente)
+            ->setParameter('config', $configuracion)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $result > 0;
+    }
 }
