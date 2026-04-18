@@ -1,3 +1,46 @@
-body {
-    background-color: skyblue;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .btn-primary {
+        @apply bg-primary text-white px-4 py-2 rounded-md font-medium hover:bg-primary-dark transition-colors;
+    }
+
+    .card {
+        @apply bg-white rounded-lg shadow-md p-6;
+    }
+}
+
+/* Animaciones personalizadas que no están en Tailwind config */
+@keyframes slideInFromTop2 {
+    from { transform: translateY(-20px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+}
+
+@layer utilities {
+    .animate-slide-in-from-top-2 {
+        animation: slideInFromTop2 0.3s ease-out;
+    }
+}
+
+/* Estilos para flash messages (pueden quedarse aquí o moverse a un componente) */
+.flash-messages-container {
+    pointer-events: none;
+}
+
+.flash-messages-container .flash-message {
+    pointer-events: auto;
+    backdrop-filter: blur(8px);
+}
+
+@media (max-width: 640px) {
+    .flash-messages-container {
+        left: 4px;
+        right: 4px;
+        max-width: calc(100% - 8px);
+        top: 4px;
+    }
 }
