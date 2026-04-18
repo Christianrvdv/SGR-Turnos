@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ClienteRepository::class)]
 #[ORM\Table(name: 'cliente')]
 #[ORM\UniqueConstraint(name: 'uk_cliente_numero_identidad', columns: ['numero_identidad'])]
+#[ORM\Index(name: 'idx_cliente_numero_tarjeta', columns: ['numero_tarjeta'])]
 class Cliente
 {
     #[ORM\Id]
@@ -19,6 +20,9 @@ class Cliente
 
     #[ORM\Column(name: 'numero_identidad', type: 'string', length: 20)]
     private ?string $numeroIdentidad = null;
+
+    #[ORM\Column(name: 'numero_tarjeta', type: 'string', length: 20, nullable: true)]
+    private ?string $numeroTarjeta = null;
 
     #[ORM\Column(name: 'nombre_completo', type: 'string', length: 150, nullable: true)]
     private ?string $nombreCompleto = null;
@@ -54,6 +58,17 @@ class Cliente
     public function setNumeroIdentidad(string $numeroIdentidad): self
     {
         $this->numeroIdentidad = $numeroIdentidad;
+        return $this;
+    }
+
+    public function getNumeroTarjeta(): ?string
+    {
+        return $this->numeroTarjeta;
+    }
+
+    public function setNumeroTarjeta(?string $numeroTarjeta): self
+    {
+        $this->numeroTarjeta = $numeroTarjeta;
         return $this;
     }
 

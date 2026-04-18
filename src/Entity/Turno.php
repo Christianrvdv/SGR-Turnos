@@ -8,8 +8,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TurnoRepository::class)]
 #[ORM\Table(name: 'turno')]
-#[ORM\UniqueConstraint(name: 'uk_turno_fecha_numero', columns: ['configuracion_diaria_id', 'numero_turno'])]
+#[ORM\UniqueConstraint(name: 'uk_turno_configuracion_numero', columns: ['configuracion_diaria_id', 'numero_turno'])]
+#[ORM\UniqueConstraint(name: 'uk_turno_configuracion_cliente', columns: ['configuracion_diaria_id', 'cliente_id'])]
 #[ORM\Index(name: 'idx_turno_cliente_estado_fecha', columns: ['cliente_id', 'estado', 'fecha_uso'])]
+#[ORM\Index(name: 'idx_turno_configuracion_numero', columns: ['configuracion_diaria_id', 'numero_turno'])]
 class Turno
 {
     #[ORM\Id]
@@ -186,6 +188,35 @@ class Turno
     public function setObservaciones(?string $observaciones): self
     {
         $this->observaciones = $observaciones;
+        return $this;
+    }
+
+    /**
+     * Marca el turno como usado, estableciendo la fecha actual y el usuario que lo procesa.
+     */
+    public function marcarComoUsado(Usuario $usuario): self
+    {
+        $this->estado = EstadoTurno::USADO;
+        $this->fechaUso = new \DateTime();
+        $this->marcadoPor = $usuario;
+        return $this;
+    }
+
+    /**
+     * Cancela el turno (no libera ticket ni bloquea al cliente).
+     */
+    public function cancelar(): self
+    {
+        $this->estado = EstadoTurno::CANCELADO;
+        return $this;
+    }
+
+    /**
+     * Marca el turno como expirado (cuando la configuración diaria se cierra sin uso).
+     */
+    public function expirar(): self
+    {
+        $this->estado = EstadoTurno::EXPIRADO;
         return $this;
     }
 }

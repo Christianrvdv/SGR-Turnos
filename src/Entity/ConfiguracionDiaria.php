@@ -53,6 +53,16 @@ class ConfiguracionDiaria
     #[ORM\Column(name: 'actualizado_en', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $actualizadoEn = null;
 
+    /**
+     * Campo de versión para bloqueo optimista.
+     * Doctrine incrementará automáticamente este valor en cada UPDATE.
+     * Si dos procesos intentan modificar la misma entidad con versiones diferentes,
+     * se lanzará una excepción OptimisticLockException.
+     */
+    #[ORM\Version]
+    #[ORM\Column(type: 'integer')]
+    private int $version = 1;
+
     #[ORM\OneToMany(mappedBy: 'configuracionDiaria', targetEntity: Turno::class)]
     private Collection $turnos;
 
@@ -185,6 +195,26 @@ class ConfiguracionDiaria
     public function setActualizadoEn(?\DateTimeInterface $actualizadoEn): self
     {
         $this->actualizadoEn = $actualizadoEn;
+        return $this;
+    }
+
+    public function getVersion(): int
+    {
+        return $this->version;
+    }
+
+    /**
+     * Método seguro para decrementar ticketsRestantes con control de integridad.
+     * Debe llamarse dentro de una transacción con bloqueo optimista activo.
+     *
+     * @throws \InvalidArgumentException si no hay tickets suficientes
+     */
+    public function decrementarTicketsRestantes(int $cantidad = 1): self
+    {
+        if ($this->ticketsRestantes < $cantidad) {
+            throw new \InvalidArgumentException('No hay suficientes tickets disponibles.');
+        }
+        $this->ticketsRestantes -= $cantidad;
         return $this;
     }
 

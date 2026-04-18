@@ -169,11 +169,26 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    // Implementación de UserInterface
+    // ---------- Implementación de UserInterface ----------
+
+    /**
+     * Devuelve un array con los roles del usuario.
+     * Se asume que el nombre del rol en la entidad Rol YA incluye el prefijo "ROLE_".
+     * Si no lo tuviera, se podría concatenar aquí, pero es mejor mantenerlo en BD.
+     */
     public function getRoles(): array
     {
-        // Devolvemos el nombre del rol prefijado con ROLE_ (asumiendo que así se guarda)
-        return [$this->rol?->getNombre() ?? 'ROLE_OPERADOR_BASICO'];
+        // Obtenemos el nombre del rol desde la entidad Rol.
+        // Este valor DEBE ser algo como "ROLE_ADMIN", "ROLE_OPERADOR", etc.
+        $rolNombre = $this->rol?->getNombre();
+
+        // Aseguramos que siempre se devuelva al menos un rol válido.
+        // Si por algún motivo no hay rol asignado, asignamos un rol por defecto.
+        if (!$rolNombre) {
+            return ['ROLE_OPERADOR_BASICO'];
+        }
+
+        return [$rolNombre];
     }
 
     public function getPassword(): ?string
@@ -181,20 +196,41 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->contrasenaHash;
     }
 
-    public function getSalt(): ?string
-    {
-        return null;
-    }
-
+    /**
+     * Symfony 6.3+: getUserIdentifier() es el método principal para identificar al usuario.
+     * Se usa el nombre de usuario.
+     */
     public function getUserIdentifier(): string
     {
         return $this->nombreUsuario;
     }
 
+    /**
+     * @deprecated desde Symfony 5.3, usar getUserIdentifier() en su lugar.
+     *             Se mantiene por compatibilidad con versiones antiguas.
+     */
+    public function getUsername(): string
+    {
+        return $this->getUserIdentifier();
+    }
+
+    /**
+     * No se usa salt con algoritmos modernos (bcrypt, argon2).
+     */
+    public function getSalt(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * Limpia datos sensibles temporales si los hubiera.
+     */
     public function eraseCredentials(): void
     {
-        // Si almacenas datos sensibles temporales, límpialos aquí
+        // Nada que limpiar en este diseño.
     }
+
+    // ---------- Relaciones ----------
 
     /**
      * @return Collection<int, ConfiguracionDiaria>

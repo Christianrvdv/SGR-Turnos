@@ -8,6 +8,7 @@ enum EstadoTurno: string
     case USADO = 'USADO';
     case CANCELADO = 'CANCELADO';
     case CADUCADO = 'CADUCADO';
+    case EXPIRADO = 'EXPIRADO';
 
     public function getLabel(): string
     {
@@ -16,6 +17,7 @@ enum EstadoTurno: string
             self::USADO => 'Usado',
             self::CANCELADO => 'Cancelado',
             self::CADUCADO => 'Caducado',
+            self::EXPIRADO => 'Expirado',
         };
     }
 }

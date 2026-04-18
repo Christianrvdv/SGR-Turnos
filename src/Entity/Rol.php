@@ -17,6 +17,9 @@ class Rol
     #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
     private ?int $id = null;
 
+    /**
+     * Nombre del rol, DEBE incluir el prefijo 'ROLE_' (ej: ROLE_ADMIN, ROLE_OPERADOR)
+     */
     #[ORM\Column(type: 'string', length: 50)]
     private ?string $nombre = null;
 
