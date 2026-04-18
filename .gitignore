@@ -43,3 +43,7 @@ desktop.ini
 
 # Archivos de composer (opcional, si quieres ignorar el lock en librerías)
 # composer.lock   # Descomenta solo si estás desarrollando una librería reusable
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
