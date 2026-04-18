@@ -1,19 +1,16 @@
-<!DOCTYPE html>
 <html class="light" lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}SGR-Turnos{% endblock %}</title>
 
-    <!-- Fuentes (Google Fonts - opcional, también puedes descargarlas) -->
+    <!-- Fuentes -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
-    <!-- AssetMapper: CSS compilado localmente (Tailwind + estilos) -->
-    {% block stylesheets %}
-        {{ asset('styles/app.css') }}
-    {% endblock %}
-
+    {# Bloque para estilos adicionales si es necesario #}
+    {% block stylesheets %}{% endblock %}
+        <link rel="stylesheet" href="{{ asset('css/tailwind.css') }}">
     {% block javascripts %}{% endblock %}
 </head>
 <body class="bg-surface text-on-surface min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
