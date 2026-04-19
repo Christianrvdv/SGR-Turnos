@@ -28,12 +28,18 @@ security:
                 path: app_logout
                 target: app_login
 
+    role_hierarchy:
+        ROLE_OPERADOR_BASICO: [ ]                     # Sin herencia
+        ROLE_OPERADOR: [ ROLE_OPERADOR_BASICO ] # Hereda del básico
+        ROLE_SUPERVISOR: [ ROLE_OPERADOR ]        # Hereda de operador
+        ROLE_ADMIN: [ ROLE_SUPERVISOR ]      # Hereda de supervisor
+        ROLE_SUPER_ADMIN: [ ROLE_ADMIN ]           # Tiene todos los permisos
+
     # Note: Only the *first* matching rule is applied
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
-        - { path: ^/dashboard, roles: ROLE_USER }
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/operador, roles: ROLE_OPERADOR }
 
 when@test:
     security:
