@@ -110,5 +110,46 @@
     {% block body %}{% endblock %}
 </main>
 
+<script>
+    window.openModal = function (modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            const firstInput = modal.querySelector('input, select, textarea');
+            if (firstInput) firstInput.focus();
+        }
+    };
+
+    window.closeModal = function (modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+            modal.dispatchEvent(new CustomEvent('modal-closed'));
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[id^="modal"]').forEach(modal => {
+            const closeOnBackdrop = modal.dataset.closeOnBackdrop !== 'false';
+            const closeOnEscape = modal.dataset.closeOnEscape !== 'false';
+
+            if (closeOnBackdrop) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeModal(modal.id);
+                });
+            }
+
+            if (closeOnEscape) {
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                        closeModal(modal.id);
+                    }
+                });
+            }
+        });
+    });
+</script>
 </body>
 </html>

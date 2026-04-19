@@ -13,7 +13,9 @@
                 <p class="text-lg text-on-surface-variant mt-2 font-medium">Administra el acceso y roles de la
                     plataforma.</p>
             </div>
-            {{ btn.primary('Nuevo Usuario', 'person_add') }}
+            {{ btn.primary('Nuevo Usuario', 'person_add', null, {
+                'onclick': "openModal('modalCrearUsuario')"
+            }) }}
         </div>
 
         {# Toolbar & Filter Section #}
@@ -170,4 +172,190 @@
             </div>
         </div>
     </div>
+
+    {# ==================== MODAL CREAR USUARIO ==================== #}
+    {% embed 'components/modal.html.twig' with {
+        id: 'modalCrearUsuario',
+        title: 'Crear Nuevo Usuario',
+        size: '2xl'
+    } %}
+        {# Importar botones dentro del embed para que estén disponibles #}
+        {% import 'components/buttons.html.twig' as btn %}
+
+        {% block body %}
+            <form id="formCrearUsuario" method="post" action="{{ path('admin_usuarios_create') }}" class="space-y-6">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('usuario_create') }}">
+
+                {# Fila 1 #}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex flex-col">
+                        <label for="nombreCompleto"
+                               class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">
+                            Nombre Completo <span class="text-error">*</span>
+                        </label>
+                        <input type="text" id="nombreCompleto" name="nombreCompleto" required
+                               class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                               placeholder="Ej: Juan Pérez">
+                        <p class="text-xs text-error mt-1 hidden error-message" data-field="nombreCompleto">Este campo
+                            es obligatorio</p>
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="nombreUsuario"
+                               class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">
+                            Nombre de Usuario <span class="text-error">*</span>
+                        </label>
+                        <input type="text" id="nombreUsuario" name="nombreUsuario" required
+                               class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                               placeholder="Ej: jperez">
+                        <p class="text-xs text-error mt-1 hidden error-message" data-field="nombreUsuario">Este campo es
+                            obligatorio</p>
+                    </div>
+                </div>
+
+                {# Fila 2 #}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex flex-col">
+                        <label for="email"
+                               class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">Email</label>
+                        <input type="email" id="email" name="email"
+                               class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                               placeholder="juan.perez@empresa.com">
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="password"
+                               class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">
+                            Contraseña <span class="text-error">*</span>
+                        </label>
+                        <div class="relative">
+                            <input type="password" id="password" name="password" required
+                                   class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all pr-10"
+                                   placeholder="••••••••">
+                            <button type="button" onclick="togglePassword()"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined text-[20px]" id="togglePasswordIcon">visibility_off</span>
+                            </button>
+                        </div>
+                        <p class="text-xs text-on-surface-variant mt-1">Mínimo 8 caracteres</p>
+                        <p class="text-xs text-error mt-1 hidden error-message" data-field="password">La contraseña es
+                            obligatoria</p>
+                    </div>
+                </div>
+
+                {# Fila 3 #}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    <div class="flex flex-col">
+                        <label for="rol"
+                               class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">
+                            Rol <span class="text-error">*</span>
+                        </label>
+                        <div class="relative">
+                            <select id="rol" name="rol" required
+                                    class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-sm text-on-surface appearance-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all cursor-pointer">
+                                <option value="" disabled selected>Seleccione un rol...</option>
+                                {% for rol in roles %}
+                                    <option
+                                        value="{{ rol.id }}">{{ rol.nombre|replace({'ROLE_': ''})|capitalize }}</option>
+                                {% endfor %}
+                            </select>
+                            <span
+                                class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                        </div>
+                        <p class="text-xs text-error mt-1 hidden error-message" data-field="rol">Debe seleccionar un
+                            rol</p>
+                    </div>
+                    <div class="flex flex-col h-full justify-center pt-6">
+                        <label class="flex items-center gap-3 cursor-pointer group w-max">
+                            <div class="relative">
+                                <input type="checkbox" id="activo" name="activo" checked class="sr-only peer">
+                                <div
+                                    class="w-11 h-6 bg-surface-container-high peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </div>
+                            <span
+                                class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">Usuario Activo</span>
+                        </label>
+                    </div>
+                </div>
+            </form>
+        {% endblock %}
+
+        {% block footer %}
+            <div class="flex items-center justify-end gap-4">
+                {{ btn.secondary('Cancelar', 'close', null, {
+                    'onclick': "closeModal('modalCrearUsuario')",
+                    'type': 'button'
+                }) }}
+                {{ btn.primary('Guardar Usuario', 'save', null, {
+                    'onclick': 'submitForm()',
+                    'type': 'button'
+                }) }}
+            </div>
+        {% endblock %}
+    {% endembed %}
+
+    <script>
+        // Limpiar formulario al cerrar modal
+        document.getElementById('modalCrearUsuario').addEventListener('modal-closed', function () {
+            document.getElementById('formCrearUsuario').reset();
+            document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('input, select').forEach(el => {
+                el.classList.remove('border-error', 'ring-1', 'ring-error/15');
+            });
+        });
+
+        // Toggle visibilidad contraseña
+        window.togglePassword = function () {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('togglePasswordIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.textContent = 'visibility';
+            } else {
+                input.type = 'password';
+                icon.textContent = 'visibility_off';
+            }
+        };
+
+        // Validación y envío del formulario
+        window.submitForm = function () {
+            const form = document.getElementById('formCrearUsuario');
+            const required = ['nombreCompleto', 'nombreUsuario', 'password', 'rol'];
+            let isValid = true;
+
+            required.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                const error = document.querySelector(`[data-field="${fieldId}"]`);
+                if (!field.value.trim()) {
+                    field.classList.add('border-error', 'ring-1', 'ring-error/15');
+                    if (error) error.classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    field.classList.remove('border-error', 'ring-1', 'ring-error/15');
+                    if (error) error.classList.add('hidden');
+                }
+            });
+
+            // Validación extra de email
+            const email = document.getElementById('email');
+            if (email.value && !/^\S+@\S+\.\S+$/.test(email.value)) {
+                email.classList.add('border-error', 'ring-1', 'ring-error/15');
+                isValid = false;
+            }
+
+            // Validación de longitud de contraseña
+            const password = document.getElementById('password');
+            if (password.value.length > 0 && password.value.length < 8) {
+                password.classList.add('border-error', 'ring-1', 'ring-error/15');
+                const pwdError = document.querySelector('[data-field="password"]');
+                if (pwdError) {
+                    pwdError.textContent = 'La contraseña debe tener al menos 8 caracteres';
+                    pwdError.classList.remove('hidden');
+                }
+                isValid = false;
+            }
+
+            if (isValid) {
+                form.submit();
+            }
+        };
+    </script>
 {% endblock %}
