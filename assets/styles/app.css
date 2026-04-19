@@ -20,3 +20,12 @@ body {
 .btn-gradient {
     background: linear-gradient(135deg, #0040a1, #0056d2);
 }
+
+@layer components {
+    .sunken-shadow {
+        box-shadow: 0 12px 32px -4px rgba(26, 28, 29, 0.08);
+    }
+    .gradient-btn {
+        background: linear-gradient(135deg, #0040a1, #0056d2);
+    }
+}
