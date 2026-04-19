@@ -13,7 +13,8 @@ class DashboardController extends AbstractController
 {
     public function __construct(
         private readonly DashboardInterface $dashboardService,
-    ) {
+    )
+    {
     }
 
     #[Route('/admin', name: 'admin_dashboard')]

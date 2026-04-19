@@ -1,5 +1,6 @@
 {# templates/admin/dashboard.html.twig #}
 {% extends 'admin/layout.html.twig' %}
+{% import 'components/buttons.html.twig' as btn %}
 
 {% block title %}Dashboard - SGR-Turnos{% endblock %}
 
@@ -14,15 +15,19 @@
         {# Grid Bento #}
         <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
             {# 1. Resumen del Día #}
-            <div class="col-span-12 md:col-span-4 bg-surface-container-lowest rounded-xl p-8 sunken-shadow flex flex-col justify-between relative overflow-hidden group">
-                <div class="absolute -right-6 -top-6 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors duration-500"></div>
+            <div
+                class="col-span-12 md:col-span-4 bg-surface-container-lowest rounded-xl p-8 sunken-shadow flex flex-col justify-between relative overflow-hidden group">
+                <div
+                    class="absolute -right-6 -top-6 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors duration-500"></div>
                 <div>
-                    <p class="text-sm font-semibold text-on-surface-variant tracking-wider uppercase mb-1">Resumen del Día</p>
+                    <p class="text-sm font-semibold text-on-surface-variant tracking-wider uppercase mb-1">Resumen del
+                        Día</p>
                     <h3 class="text-3xl font-bold text-primary mt-2">{{ fecha|date('d F Y') }}</h3>
                 </div>
                 <div class="mt-8 flex items-center justify-between">
                     <div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center">
-                        <span class="material-symbols-outlined text-primary-fixed-variant" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+                        <span class="material-symbols-outlined text-primary-fixed-variant"
+                              style="font-variation-settings: 'FILL' 1;">calendar_month</span>
                     </div>
                     <p class="text-sm font-medium text-on-surface-variant text-right">
                         {{ diaSemana }}<br/>Semana {{ semana }}
@@ -31,10 +36,12 @@
             </div>
 
             {# 2. Turnos Activos (Pendientes hoy) #}
-            <div class="col-span-12 md:col-span-4 bg-surface-container-lowest rounded-xl p-8 sunken-shadow flex flex-col justify-between">
+            <div
+                class="col-span-12 md:col-span-4 bg-surface-container-lowest rounded-xl p-8 sunken-shadow flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between mb-4">
-                        <p class="text-sm font-semibold text-on-surface-variant tracking-wider uppercase">Turnos Activos</p>
+                        <p class="text-sm font-semibold text-on-surface-variant tracking-wider uppercase">Turnos
+                            Activos</p>
                         <span class="material-symbols-outlined text-outline-variant">trending_up</span>
                     </div>
                     <div class="flex items-baseline gap-2">
@@ -49,13 +56,16 @@
             </div>
 
             {# 3. Cajero Automático (Disponibilidad) #}
-            <div class="col-span-12 md:col-span-4 bg-surface-container-lowest rounded-xl p-8 sunken-shadow flex flex-col justify-between">
+            <div
+                class="col-span-12 md:col-span-4 bg-surface-container-lowest rounded-xl p-8 sunken-shadow flex flex-col justify-between">
                 <div class="flex items-center justify-between mb-6">
-                    <p class="text-sm font-semibold text-on-surface-variant tracking-wider uppercase">Cajero Automático</p>
+                    <p class="text-sm font-semibold text-on-surface-variant tracking-wider uppercase">Cajero
+                        Automático</p>
                     <span class="material-symbols-outlined text-outline-variant">atm</span>
                 </div>
                 <div class="space-y-4">
-                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed/50 text-on-primary-fixed-variant border border-primary-fixed">
+                    <div
+                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-fixed/50 text-on-primary-fixed-variant border border-primary-fixed">
                         <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
                         <span class="text-xs font-bold uppercase tracking-wide">Operativo</span>
                     </div>
@@ -76,14 +86,8 @@
                     <p class="text-sm text-on-surface-variant mt-1">Gestión inmediata de flujo</p>
                 </div>
                 <div class="flex flex-wrap gap-4">
-                    <button class="gradient-btn text-on-primary px-8 py-3 rounded-full font-semibold text-sm transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-md flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[20px]">add_circle</span>
-                        Registrar Turno
-                    </button>
-                    <button class="px-8 py-3 rounded-full font-semibold text-sm text-primary border border-outline-variant/40 hover:bg-surface-container hover:border-outline-variant transition-all duration-200 flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[20px]">list_alt</span>
-                        Ver Listado de Hoy
-                    </button>
+                    {{ btn.primary('Registrar Turno', 'add_circle') }}
+                    {{ btn.secondary('Ver Listado de Hoy', 'list_alt') }}
                 </div>
             </div>
         </div>

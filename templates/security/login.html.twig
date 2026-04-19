@@ -7,11 +7,13 @@
         <!-- Header -->
         <div class="flex flex-col items-start gap-4">
             <div class="flex items-center gap-3">
-                <span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+                <span class="material-symbols-outlined text-primary text-4xl"
+                      style="font-variation-settings: 'FILL' 1;">account_balance</span>
                 <span class="text-2xl font-bold tracking-tighter text-primary">SGR-Turnos</span>
             </div>
             <div>
-                <h1 class="text-[2.75rem] font-headline font-bold leading-tight tracking-tight text-on-surface ml-6">Acceso al Sistema</h1>
+                <h1 class="text-[2.75rem] font-headline font-bold leading-tight tracking-tight text-on-surface ml-6">
+                    Acceso al Sistema</h1>
             </div>
         </div>
 
@@ -31,7 +33,8 @@
             <!-- Campo usuario -->
             <div class="flex flex-col gap-2">
                 <label class="text-sm font-medium text-on-surface-variant font-label" for="username">Usuario</label>
-                <div class="relative flex items-center bg-surface-container-lowest rounded-lg border border-outline-variant/20 input-glow transition-shadow">
+                <div
+                    class="relative flex items-center bg-surface-container-lowest rounded-lg border border-outline-variant/20 input-glow transition-shadow">
                     <span class="material-symbols-outlined absolute left-4 text-on-surface-variant">person</span>
                     <input type="text" id="username" name="_username" value="{{ last_username }}"
                            class="w-full bg-transparent border-none py-3 pl-12 pr-4 text-on-surface placeholder:text-outline focus:ring-0 rounded-lg"
@@ -42,7 +45,8 @@
             <!-- Campo contraseña -->
             <div class="flex flex-col gap-2">
                 <label class="text-sm font-medium text-on-surface-variant font-label" for="password">Contraseña</label>
-                <div class="relative flex items-center bg-surface-container-lowest rounded-lg border border-outline-variant/20 input-glow transition-shadow">
+                <div
+                    class="relative flex items-center bg-surface-container-lowest rounded-lg border border-outline-variant/20 input-glow transition-shadow">
                     <span class="material-symbols-outlined absolute left-4 text-on-surface-variant">lock</span>
                     <input type="password" id="password" name="_password"
                            class="w-full bg-transparent border-none py-3 pl-12 pr-4 text-on-surface placeholder:text-outline focus:ring-0 rounded-lg"
@@ -52,11 +56,13 @@
 
             <!-- Acciones -->
             <div class="flex flex-col gap-4 mt-2">
-                <button type="submit" class="w-full btn-gradient text-on-primary py-4 px-6 rounded-lg font-semibold tracking-wide hover:opacity-90 active:scale-[0.98] transition-all flex justify-center items-center gap-2">
+                <button type="submit"
+                        class="w-full btn-gradient text-on-primary py-4 px-6 rounded-lg font-semibold tracking-wide hover:opacity-90 active:scale-[0.98] transition-all flex justify-center items-center gap-2">
                     <span>Iniciar Sesión</span>
                     <span class="material-symbols-outlined">arrow_forward</span>
                 </button>
-                <a href="#" class="text-sm font-medium text-primary text-center hover:text-primary-container transition-colors py-2">
+                <a href="#"
+                   class="text-sm font-medium text-primary text-center hover:text-primary-container transition-colors py-2">
                     ¿Olvidaste tu contraseña?
                 </a>
             </div>

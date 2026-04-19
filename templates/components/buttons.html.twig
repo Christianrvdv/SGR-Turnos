@@ -1,0 +1,69 @@
+{# templates/components/buttons.html.twig #}
+
+{#
+Botón primario (gradiente, usado para acciones principales como "Registrar Turno", "Nuevo Usuario")
+Parámetros:
+    - text: Texto del botón
+    - icon: Nombre del ícono de Material Symbols (opcional, por defecto 'add')
+    - href: Si se proporciona, se renderiza como <a>, si no como <button>
+    - attr: Atributos adicionales (class, data-*, etc.)
+#}
+{% macro primary(text, icon = 'add', href = null, attr = {}) %}
+    {% set baseClass = 'gradient-btn text-on-primary px-6 py-3 rounded-full font-semibold text-sm transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-md flex items-center gap-2' %}
+    {% set combinedClass = baseClass ~ ' ' ~ (attr.class|default('')) %}
+
+    {% if href %}
+        <a href="{{ href }}" class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
+        <span class="material-symbols-outlined text-[20px]">{{ icon }}</span>
+        {{ text }}
+        </a>
+    {% else %}
+        <button class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
+        <span class="material-symbols-outlined text-[20px]">{{ icon }}</span>
+        {{ text }}
+        </button>
+    {% endif %}
+{% endmacro %}
+
+{#
+Botón secundario (borde, usado para acciones como "Ver Listado de Hoy")
+Parámetros:
+    - text: Texto del botón
+    - icon: Nombre del ícono (opcional, por defecto 'list_alt')
+    - href: Si se proporciona, se renderiza como <a>
+    - attr: Atributos adicionales
+#}
+{% macro secondary(text, icon = 'list_alt', href = null, attr = {}) %}
+    {% set baseClass = 'px-6 py-3 rounded-full font-semibold text-sm text-primary border border-outline-variant/40 hover:bg-surface-container hover:border-outline-variant transition-all duration-200 flex items-center gap-2' %}
+    {% set combinedClass = baseClass ~ ' ' ~ (attr.class|default('')) %}
+
+    {% if href %}
+        <a href="{{ href }}" class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
+        <span class="material-symbols-outlined text-[20px]">{{ icon }}</span>
+        {{ text }}
+        </a>
+    {% else %}
+        <button class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
+        <span class="material-symbols-outlined text-[20px]">{{ icon }}</span>
+        {{ text }}
+        </button>
+    {% endif %}
+{% endmacro %}
+
+{#
+Botón de ícono (solo ícono, usado para acciones pequeñas como editar/eliminar)
+#}
+{% macro icon(icon, href = null, attr = {}) %}
+    {% set baseClass = 'p-1.5 text-on-surface-variant hover:text-primary transition-colors rounded-lg hover:bg-surface-container-highest' %}
+    {% set combinedClass = baseClass ~ ' ' ~ (attr.class|default('')) %}
+
+    {% if href %}
+        <a href="{{ href }}" class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
+        <span class="material-symbols-outlined text-[20px]">{{ icon }}</span>
+        </a>
+    {% else %}
+        <button class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
+        <span class="material-symbols-outlined text-[20px]">{{ icon }}</span>
+        </button>
+    {% endif %}
+{% endmacro %}

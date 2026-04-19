@@ -6,19 +6,23 @@
 
     <!-- Fuentes -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+          rel="stylesheet">
 
     {# Bloque para estilos adicionales si es necesario #}
     {% block stylesheets %}{% endblock %}
-        <link rel="stylesheet" href="{{ asset('css/tailwind.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/tailwind.css') }}">
     {% block javascripts %}{% endblock %}
 </head>
-<body class="bg-surface text-on-surface min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+<body
+    class="bg-surface text-on-surface min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
 
 <!-- Elementos de fondo ambientales -->
 <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-    <div class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-surface-container-low rounded-full blur-3xl opacity-50"></div>
-    <div class="absolute bottom-[10%] -right-[10%] w-[60%] h-[60%] bg-surface-container rounded-full blur-3xl opacity-50"></div>
+    <div
+        class="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] bg-surface-container-low rounded-full blur-3xl opacity-50"></div>
+    <div
+        class="absolute bottom-[10%] -right-[10%] w-[60%] h-[60%] bg-surface-container rounded-full blur-3xl opacity-50"></div>
 </div>
 
 <!-- Contenido principal -->
@@ -27,14 +31,18 @@
 </main>
 
 <!-- Footer -->
-<footer class="fixed bottom-0 w-full py-6 flex flex-col md:flex-row justify-center items-center gap-4 px-8 z-10 bg-transparent">
+<footer
+    class="fixed bottom-0 w-full py-6 flex flex-col md:flex-row justify-center items-center gap-4 px-8 z-10 bg-transparent">
     <p class="font-['Inter'] text-sm font-medium text-on-surface-variant">
         © 2024 SGR-Turnos. Architectural Serenity.
     </p>
     <div class="flex gap-4">
-        <a class="font-['Inter'] text-sm font-medium text-[#424654] hover:text-[#0040a1] transition-opacity opacity-100 hover:opacity-80" href="#">Privacy</a>
-        <a class="font-['Inter'] text-sm font-medium text-[#424654] hover:text-[#0040a1] transition-opacity opacity-100 hover:opacity-80" href="#">Terms</a>
-        <a class="font-['Inter'] text-sm font-medium text-[#424654] hover:text-[#0040a1] transition-opacity opacity-100 hover:opacity-80" href="#">Support</a>
+        <a class="font-['Inter'] text-sm font-medium text-[#424654] hover:text-[#0040a1] transition-opacity opacity-100 hover:opacity-80"
+           href="#">Privacy</a>
+        <a class="font-['Inter'] text-sm font-medium text-[#424654] hover:text-[#0040a1] transition-opacity opacity-100 hover:opacity-80"
+           href="#">Terms</a>
+        <a class="font-['Inter'] text-sm font-medium text-[#424654] hover:text-[#0040a1] transition-opacity opacity-100 hover:opacity-80"
+           href="#">Support</a>
     </div>
 </footer>
 </body>
