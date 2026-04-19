@@ -1,0 +1,198 @@
+{# templates/admin/servicios/index.html.twig #}
+{% extends 'admin/layout.html.twig' %}
+{% import 'components/buttons.html.twig' as btn %}
+
+{% block title %}Gestión de Servicios - SGR-Turnos{% endblock %}
+
+{% block body %}
+    <div class="max-w-7xl mx-auto space-y-8">
+        {# Header Section #}
+        <div class="flex justify-between items-end pl-6 border-l-4 border-primary/30">
+            <div>
+                <h2 class="text-4xl font-bold font-headline text-on-surface tracking-tight">Gestión de Servicios</h2>
+                <p class="text-lg text-on-surface-variant mt-2 font-medium">Administre los tipos de servicios ofrecidos
+                    y sus configuraciones.</p>
+            </div>
+            {{ btn.primary('Nuevo Servicio', 'add_circle') }}
+        </div>
+
+        {# Toolbar & Filter Section #}
+        <div class="bg-surface-container-lowest rounded-xl p-4 sunken-shadow flex items-center justify-between">
+            <form method="get" class="relative w-96">
+                <span
+                    class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search }}"
+                    class="w-full bg-surface-container-low border-none rounded-lg py-3 pl-10 pr-4 text-sm text-on-surface placeholder:text-outline-variant focus:ring-2 focus:ring-primary/20 transition-shadow"
+                    placeholder="Filtrar por código, nombre o descripción"
+                >
+                {% if search %}
+                    <a href="{{ path('admin_servicios_index') }}"
+                       class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface">
+                        <span class="material-symbols-outlined text-[18px]">close</span>
+                    </a>
+                {% endif %}
+            </form>
+            <div class="flex gap-2">
+                <button
+                    class="p-2.5 rounded-lg border border-outline-variant/20 text-on-surface-variant hover:bg-surface-container-low transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">filter_list</span>
+                </button>
+                <button
+                    class="p-2.5 rounded-lg border border-outline-variant/20 text-on-surface-variant hover:bg-surface-container-low transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">view_column</span>
+                </button>
+            </div>
+        </div>
+
+        {# Data Table #}
+        <div class="bg-surface-container-lowest rounded-xl sunken-shadow overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                    <tr class="bg-surface-container border-b border-outline-variant/20">
+                        <th class="py-4 px-6 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                            Código
+                        </th>
+                        <th class="py-4 px-6 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                            Nombre
+                        </th>
+                        <th class="py-4 px-6 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                            Reserva Futura
+                        </th>
+                        <th class="py-4 px-6 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                            Control Frec.
+                        </th>
+                        <th class="py-4 px-6 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                            Días Bloqueo
+                        </th>
+                        <th class="py-4 px-6 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                            Estado
+                        </th>
+                        <th class="py-4 px-6 text-xs font-semibold text-on-surface-variant uppercase tracking-wider text-right">
+                            Acciones
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-outline-variant/10">
+                    {% for servicio in servicios %}
+                        <tr class="group hover:bg-surface-container-low transition-colors duration-150">
+                            <td class="py-4 px-6 font-medium text-on-surface">{{ servicio.codigo }}</td>
+                            <td class="py-4 px-6 text-on-surface font-medium">{{ servicio.nombre }}</td>
+                            <td class="py-4 px-6">
+                                {% if servicio.permiteReservaFutura %}
+                                    <span
+                                        class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-secondary-container text-on-secondary-container">
+                                        Sí
+                                    </span>
+                                {% else %}
+                                    <span
+                                        class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-surface-container-high text-on-surface-variant">
+                                        No
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="py-4 px-6">
+                                {% if servicio.requiereControlFrecuencia %}
+                                    <span
+                                        class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-secondary-container text-on-secondary-container">
+                                        Activado
+                                    </span>
+                                {% else %}
+                                    <span
+                                        class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-surface-container-high text-on-surface-variant">
+                                        Desactivado
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="py-4 px-6 text-on-surface-variant">{{ servicio.diasBloqueo ?? 0 }}</td>
+                            <td class="py-4 px-6">
+                                {% if servicio.activo %}
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-secondary-container text-on-secondary-container">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Activo
+                                    </span>
+                                {% else %}
+                                    <span
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-error-container text-on-error-container">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-error"></span> Inactivo
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                <div
+                                    class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    {{ btn.icon('edit', null, {title: 'Editar'}) }}
+                                    {{ btn.icon('delete', null, {title: 'Eliminar', class: 'hover:text-error hover:bg-error-container'}) }}
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="py-12 text-center text-on-surface-variant">
+                                <span class="material-symbols-outlined text-4xl mb-2">inventory_2</span>
+                                <p class="text-lg font-medium">No se encontraron servicios</p>
+                                <p class="text-sm">Intenta con otros términos de búsqueda</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {# Pagination Footer #}
+            <div
+                class="bg-surface-container-lowest px-6 py-4 border-t border-outline-variant/20 flex items-center justify-between">
+            <span class="text-sm text-on-surface-variant">
+                {% if totalServicios > 0 %}
+                    Mostrando {{ ((currentPage - 1) * limit) + 1 }} a {{ min(currentPage * limit, totalServicios) }} de {{ totalServicios }} servicios
+                {% else %}
+                    No hay servicios registrados
+                {% endif %}
+            </span>
+                <div class="flex gap-2">
+                    {% if currentPage > 1 %}
+                        <a href="{{ path('admin_servicios_index', {page: currentPage - 1, search: search}) }}"
+                           class="px-3 py-1.5 text-sm font-medium text-on-surface-variant bg-surface-container-low rounded-lg hover:bg-surface-container-high transition-colors">
+                            Anterior
+                        </a>
+                    {% else %}
+                        <button disabled
+                                class="px-3 py-1.5 text-sm font-medium text-on-surface-variant/50 bg-surface-container-low rounded-lg cursor-not-allowed">
+                            Anterior
+                        </button>
+                    {% endif %}
+
+                    {# Números de página simplificados #}
+                    {% for i in 1..totalPages %}
+                        {% if i == currentPage %}
+                            <span
+                                class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-on-primary font-medium text-sm">{{ i }}</span>
+                        {% elseif i <= 3 or i > totalPages - 3 or (i >= currentPage - 1 and i <= currentPage + 1) %}
+                            <a href="{{ path('admin_servicios_index', {page: i, search: search}) }}"
+                               class="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-low font-medium text-sm transition-colors">
+                                {{ i }}
+                            </a>
+                        {% elseif i == 4 or i == totalPages - 3 %}
+                            <span class="text-on-surface-variant px-1">...</span>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if currentPage < totalPages %}
+                        <a href="{{ path('admin_servicios_index', {page: currentPage + 1, search: search}) }}"
+                           class="px-3 py-1.5 text-sm font-medium text-on-surface bg-surface-container-low rounded-lg hover:bg-surface-container-high transition-colors">
+                            Siguiente
+                        </a>
+                    {% else %}
+                        <button disabled
+                                class="px-3 py-1.5 text-sm font-medium text-on-surface-variant/50 bg-surface-container-low rounded-lg cursor-not-allowed">
+                            Siguiente
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
