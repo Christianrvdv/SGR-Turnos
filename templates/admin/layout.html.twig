@@ -53,9 +53,10 @@
             <span class="material-symbols-outlined">calendar_today</span>
             Calendario
         </a>
-        <a href="#"
-           class="flex items-center gap-3 px-4 py-3 text-on-surface-variant font-medium hover:bg-surface-container rounded-lg transition-all duration-200">
-            <span class="material-symbols-outlined">history_edu</span>
+        <a href="{{ path('admin_auditoria_index') }}"
+           class="flex items-center gap-3 px-4 py-3 {{ ruta_actual starts with 'admin_auditoria' ? 'text-primary font-semibold bg-surface-container' : 'text-on-surface-variant font-medium hover:bg-surface-container' }} rounded-lg transition-all duration-200">
+            <span
+                class="material-symbols-outlined" {{ ruta_actual starts with 'admin_auditoria' ? 'style="font-variation-settings: \'FILL\' 1;"' : '' }}>history_edu</span>
             Auditoría
         </a>
     </div>
