@@ -1,0 +1,211 @@
+{# templates/admin/calendario/index.html.twig #}
+{% extends 'admin/layout.html.twig' %}
+{% import 'components/buttons.html.twig' as btn %}
+
+{% block title %}Calendario - SGR-Turnos{% endblock %}
+
+{% block body %}
+    <div class="max-w-7xl mx-auto space-y-8">
+        {# Header Section #}
+        <div class="flex justify-between items-end pl-6 border-l-4 border-primary/30">
+            <div>
+                <h2 class="text-4xl font-bold font-headline text-on-surface tracking-tight">Configuración Diaria</h2>
+                <p class="text-lg text-on-surface-variant mt-2 font-medium">
+                    {% if servicioSeleccionado %}
+                        {{ servicioSeleccionado.nombre }}
+                    {% else %}
+                        Seleccione un servicio
+                    {% endif %}
+                </p>
+            </div>
+            <div class="flex items-center gap-3">
+                {# Selector de servicio #}
+                <form method="get" class="relative" id="selectorServicio">
+                    <input type="hidden" name="mes" value="{{ mesActual }}">
+                    <input type="hidden" name="anio" value="{{ anioActual }}">
+                    <select name="servicio" onchange="this.form.submit()"
+                            class="appearance-none bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-2.5 pl-4 pr-10 text-sm font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all">
+                        {% for servicio in servicios %}
+                            <option value="{{ servicio.id }}" {{ servicioSeleccionado and servicio.id == servicioSeleccionado.id ? 'selected' : '' }}>
+                                {{ servicio.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                </form>
+                {{ btn.primary('Nueva Configuración', 'add_circle') }}
+            </div>
+        </div>
+
+        {# Grid principal #}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            {# Columna del Calendario (2/3) #}
+            <div class="lg:col-span-2 space-y-6">
+                {# Card del Calendario #}
+                <div class="bg-surface-container-lowest rounded-xl sunken-shadow p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-on-surface">{{ nombreMes }} {{ anioActual }}</h3>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ path('admin_calendario_index', {mes: mesAnterior, anio: anioAnterior, servicio: servicioSeleccionado ? servicioSeleccionado.id : ''}) }}"
+                               class="p-2 rounded-full hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined">chevron_left</span>
+                            </a>
+                            <a href="{{ path('admin_calendario_index', {mes: mesSiguiente, anio: anioSiguiente, servicio: servicioSeleccionado ? servicioSeleccionado.id : ''}) }}"
+                               class="p-2 rounded-full hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined">chevron_right</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    {# Días de la semana #}
+                    <div class="grid grid-cols-7 gap-2 mb-3">
+                        {% for dia in ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'] %}
+                            <div class="text-center text-xs font-semibold text-on-surface-variant uppercase tracking-wider py-1">
+                                {{ dia }}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    {# Grid de días #}
+                    <div class="grid grid-cols-7 gap-2">
+                        {% for item in diasDelMes %}
+                            {% if item is null %}
+                                <div class="aspect-square p-1"></div>
+                            {% else %}
+                                {% set config = item.config %}
+                                {% set estadoClase = config ? (config.estado.value == 'ABIERTA' ? 'bg-green-100 border-green-300' : (config.estado.value == 'CERRADA' ? 'bg-error-container/30 border-error/30' : 'bg-surface-container-high border-outline-variant/30')) : 'bg-surface-container-low border-outline-variant/20' %}
+                                <div class="aspect-square p-1">
+                                    <div class="h-full rounded-lg border {{ estadoClase }} {{ item.esHoy ? 'ring-2 ring-primary ring-offset-1' : '' }} flex flex-col items-center justify-center relative hover:shadow-md transition-shadow cursor-pointer group"
+                                         onclick="alert('Día {{ item.dia }} - {{ config ? config.estado.value : 'Sin configuración' }}')">
+                                    <span class="text-sm font-medium {{ item.esHoy ? 'text-primary font-bold' : 'text-on-surface' }}">
+                                        {{ item.dia }}
+                                    </span>
+                                        {% if config %}
+                                            <div class="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
+                                                <span class="w-1.5 h-1.5 rounded-full {{ config.estado.value == 'ABIERTA' ? 'bg-green-500' : (config.estado.value == 'CERRADA' ? 'bg-error' : 'bg-outline') }}"></span>
+                                            </div>
+                                            <div class="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-surface-container-high text-on-surface text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap z-10">
+                                                {{ config.estado.value }}<br>
+                                                Tickets: {{ config.ticketsRestantes }}/{{ config.ticketsGenerados }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    {# Leyenda #}
+                    <div class="flex items-center gap-6 mt-6 pt-4 border-t border-outline-variant/20 text-xs">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                            <span class="text-on-surface-variant">Abierta</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-error"></span>
+                            <span class="text-on-surface-variant">Cerrada</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-outline"></span>
+                            <span class="text-on-surface-variant">Finalizada</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full border-2 border-primary"></span>
+                            <span class="text-on-surface-variant">Sin configurar</span>
+                        </div>
+                    </div>
+                </div>
+
+                {# Tabla de configuraciones del día seleccionado (placeholder) #}
+                <div class="bg-surface-container-lowest rounded-xl sunken-shadow overflow-hidden">
+                    <div class="p-5 border-b border-outline-variant/20">
+                        <h3 class="text-lg font-semibold text-on-surface">Configuraciones del Mes</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                            <tr class="bg-surface-container border-b border-outline-variant/20">
+                                <th class="py-3 pl-6 pr-4 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Fecha</th>
+                                <th class="py-3 px-4 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Monto Cargado</th>
+                                <th class="py-3 px-4 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Tickets</th>
+                                <th class="py-3 px-4 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Estado</th>
+                                <th class="py-3 pr-6 pl-4 text-xs font-semibold text-on-surface-variant uppercase tracking-wider text-right">Acciones</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in diasDelMes %}
+                                {% if item is not null and item.config %}
+                                    {% set config = item.config %}
+                                    <tr class="group hover:bg-surface-container-low transition-colors duration-150">
+                                        <td class="py-3 pl-6 pr-4 font-medium text-on-surface">{{ config.fecha|date('d/m/Y') }}</td>
+                                        <td class="py-3 px-4 text-on-surface-variant">$ {{ config.montoCargado|number_format(2) }}</td>
+                                        <td class="py-3 px-4 text-on-surface-variant">{{ config.ticketsRestantes }}/{{ config.ticketsGenerados }}</td>
+                                        <td class="py-3 px-4">
+                                            {% if config.estado.value == 'ABIERTA' %}
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium bg-green-100 text-green-800">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Abierta
+                                                </span>
+                                            {% elseif config.estado.value == 'CERRADA' %}
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium bg-error-container text-on-error-container">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-error"></span> Cerrada
+                                                </span>
+                                            {% else %}
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium bg-surface-container-high text-on-surface-variant">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-outline"></span> {{ config.estado.value }}
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="py-3 pr-6 pl-4 text-right">
+                                            <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                {{ btn.icon('edit', null, {title: 'Editar'}) }}
+                                                {{ btn.icon('visibility', null, {title: 'Ver'}) }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr><td class="h-px bg-surface-container-low" colspan="5"></td></tr>
+                                {% endif %}
+                            {% endfor %}
+                            {% if diasDelMes|filter(i => i.config is defined and i.config) is empty %}
+                                <tr>
+                                    <td colspan="5" class="py-12 text-center text-on-surface-variant">
+                                        <span class="material-symbols-outlined text-4xl mb-2">event_busy</span>
+                                        <p class="text-lg font-medium">No hay configuraciones este mes</p>
+                                        <p class="text-sm">Crea una nueva configuración para comenzar</p>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {# Sidebar derecho (1/3) #}
+            <div class="lg:col-span-1 space-y-6">
+                {# Resumen rápido #}
+                <div class="bg-gradient-to-br from-surface-container-low to-surface-container rounded-xl p-6">
+                    <div class="flex items-start gap-3">
+                        <div class="mt-0.5 text-primary opacity-80">
+                            <span class="material-symbols-outlined">info</span>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-semibold text-on-surface mb-1">Capacidad Promedio (7 días)</h4>
+                            <p class="text-xs text-on-surface-variant leading-relaxed">
+                                Promedio de <strong>{{ stats.promedioTickets }} tickets</strong> generados por día para este servicio.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {# Acciones rápidas #}
+                <div class="bg-surface-container-lowest rounded-xl sunken-shadow p-6">
+                    <h4 class="text-sm font-semibold text-on-surface mb-4">Acciones Rápidas</h4>
+                    <div class="space-y-3">
+                        {{ btn.primary('Calcular Capacidad', 'calculate', null, {class: 'w-full justify-center'}) }}
+                        {{ btn.secondary('Ver Todos los Servicios', 'settings_suggest', path('admin_servicios_index'), {class: 'w-full justify-center'}) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
