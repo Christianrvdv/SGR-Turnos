@@ -26,7 +26,8 @@ class LoginAuditSubscriber implements EventSubscriberInterface
 
     public function onInteractiveLogin(InteractiveLoginEvent $event): void
     {
-        $user = $event->getUser();
+        $token = $event->getAuthenticationToken();
+        $user = $token->getUser();
 
         if (!$user instanceof Usuario) {
             return;

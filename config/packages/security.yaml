@@ -12,42 +12,40 @@ security:
 
     firewalls:
         dev:
-            # Ensure dev tools and static assets are always allowed
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
         main:
             lazy: true
-            provider: app_user_provider  # Define tu provider de usuarios (ej. entity)
+            provider: app_user_provider
             form_login:
                 login_path: app_login
                 check_path: app_login_check
                 username_parameter: _username
                 password_parameter: _password
-                default_target_path: app_dashboard  # Ruta post-login exitoso
+                default_target_path: app_ingreso_ci   # ← Redirige a pantalla de ingreso de CI después del login
             logout:
                 path: app_logout
                 target: app_login
 
     role_hierarchy:
-        ROLE_OPERADOR_BASICO: [ ]                     # Sin herencia
-        ROLE_OPERADOR: [ ROLE_OPERADOR_BASICO ] # Hereda del básico
-        ROLE_SUPERVISOR: [ ROLE_OPERADOR ]        # Hereda de operador
-        ROLE_ADMIN: [ ROLE_SUPERVISOR ]      # Hereda de supervisor
-        ROLE_SUPER_ADMIN: [ ROLE_ADMIN ]           # Tiene todos los permisos
+        ROLE_OPERADOR_BASICO: [ ]
+        ROLE_OPERADOR: [ ROLE_OPERADOR_BASICO ]
+        ROLE_SUPERVISOR: [ ROLE_OPERADOR ]
+        ROLE_ADMIN: [ ROLE_SUPERVISOR ]
+        ROLE_SUPER_ADMIN: [ ROLE_ADMIN ]
 
     # Note: Only the *first* matching rule is applied
     access_control:
         - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/ingreso, roles: ROLE_OPERADOR_BASICO }   # ← Protege la pantalla de CI
         - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/operador, roles: ROLE_OPERADOR }
+        # - { path: ^/operador, roles: ROLE_OPERADOR }       # Opcional, si tienes otras rutas de operador
 
 when@test:
     security:
         password_hashers:
-            # Password hashers are resource-intensive by design to ensure security.
-            # In tests, it's safe to reduce their cost to improve performance.
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
                 algorithm: auto
-                cost: 4 # Lowest possible value for bcrypt
-                time_cost: 3 # Lowest possible value for argon
-                memory_cost: 10 # Lowest possible value for argon
+                cost: 4
+                time_cost: 3
+                memory_cost: 10
