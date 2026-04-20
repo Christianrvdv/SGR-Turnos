@@ -13,12 +13,14 @@ Parámetros:
     {% set combinedClass = baseClass ~ ' ' ~ (attr.class|default('')) %}
 
     {% if href %}
-        <a href="{{ href }}" class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
+        <a href="{{ href }}"
+           class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
         <span class="material-symbols-outlined text-[20px]">{{ icon }}</span>
         {{ text }}
         </a>
     {% else %}
-        <button class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
+        <button
+            class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
         <span class="material-symbols-outlined text-[20px]">{{ icon }}</span>
         {{ text }}
         </button>
@@ -38,12 +40,14 @@ Parámetros:
     {% set combinedClass = baseClass ~ ' ' ~ (attr.class|default('')) %}
 
     {% if href %}
-        <a href="{{ href }}" class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
+        <a href="{{ href }}"
+           class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
         <span class="material-symbols-outlined text-[20px]">{{ icon }}</span>
         {{ text }}
         </a>
     {% else %}
-        <button class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
+        <button
+            class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
         <span class="material-symbols-outlined text-[20px]">{{ icon }}</span>
         {{ text }}
         </button>
@@ -58,11 +62,13 @@ Botón de ícono (solo ícono, usado para acciones pequeñas como editar/elimina
     {% set combinedClass = baseClass ~ ' ' ~ (attr.class|default('')) %}
 
     {% if href %}
-        <a href="{{ href }}" class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
+        <a href="{{ href }}"
+           class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
         <span class="material-symbols-outlined text-[20px]">{{ icon }}</span>
         </a>
     {% else %}
-        <button class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
+        <button
+            class="{{ combinedClass }}" {% for key, value in attr %}{% if key != 'class' %}{{ key }}="{{ value }}"{% endif %}{% endfor %}>
         <span class="material-symbols-outlined text-[20px]">{{ icon }}</span>
         </button>
     {% endif %}

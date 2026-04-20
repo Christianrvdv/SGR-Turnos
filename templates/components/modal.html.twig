@@ -19,7 +19,8 @@
      class="fixed inset-0 bg-on-surface/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 sm:p-6 hidden transition-opacity duration-200"
      data-close-on-backdrop="{{ closeOnBackdrop ? 'true' : 'false' }}"
      data-close-on-escape="{{ closeOnEscape ? 'true' : 'false' }}">
-    <div class="bg-surface-container-lowest w-full {{ sizeClasses[size]|default('max-w-2xl') }} rounded-xl sunken-shadow flex flex-col overflow-hidden max-h-[90vh]">
+    <div
+        class="bg-surface-container-lowest w-full {{ sizeClasses[size]|default('max-w-2xl') }} rounded-xl sunken-shadow flex flex-col overflow-hidden max-h-[90vh]">
         {% block header %}
             {% if title or showCloseButton %}
                 <div class="px-8 py-6 bg-surface flex items-center justify-between">

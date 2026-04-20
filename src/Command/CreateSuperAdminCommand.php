@@ -23,10 +23,11 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 class CreateSuperAdminCommand extends Command
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
+        private readonly EntityManagerInterface      $entityManager,
         private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly RolRepository $rolRepository,
-    ) {
+        private readonly RolRepository               $rolRepository,
+    )
+    {
         parent::__construct();
     }
 

@@ -16,8 +16,9 @@ class AuditoriaController extends AbstractController
 {
     public function __construct(
         private readonly AuditoriaRepository $auditoriaRepository,
-        private readonly UsuarioRepository $usuarioRepository,
-    ) {
+        private readonly UsuarioRepository   $usuarioRepository,
+    )
+    {
     }
 
     #[Route('/admin/auditoria', name: 'admin_auditoria_index')]
@@ -66,7 +67,7 @@ class AuditoriaController extends AbstractController
             ->getQuery()
             ->getResult();
 
-        $totalPages = (int) ceil($totalRegistros / $limit);
+        $totalPages = (int)ceil($totalRegistros / $limit);
 
         // Obtener usuarios para filtro
         $usuarios = $this->usuarioRepository->findAll();

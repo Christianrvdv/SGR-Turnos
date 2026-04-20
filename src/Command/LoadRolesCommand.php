@@ -20,15 +20,16 @@ class LoadRolesCommand extends Command
 {
     private const ROLES = [
         'ROLE_OPERADOR_BASICO' => 'Operador básico: acceso mínimo a turnos',
-        'ROLE_OPERADOR'        => 'Operador: gestión completa de turnos',
-        'ROLE_SUPERVISOR'      => 'Supervisor: supervisión y reportes',
-        'ROLE_ADMIN'           => 'Administrador: configuración del sistema',
-        'ROLE_SUPER_ADMIN'     => 'Super Administrador: acceso total sin restricciones',
+        'ROLE_OPERADOR' => 'Operador: gestión completa de turnos',
+        'ROLE_SUPERVISOR' => 'Supervisor: supervisión y reportes',
+        'ROLE_ADMIN' => 'Administrador: configuración del sistema',
+        'ROLE_SUPER_ADMIN' => 'Super Administrador: acceso total sin restricciones',
     ];
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-    ) {
+    )
+    {
         parent::__construct();
     }
 
