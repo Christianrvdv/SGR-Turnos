@@ -6,6 +6,7 @@ namespace App\Controller\Admin;
 use App\Entity\Usuario;
 use App\Repository\RolRepository;
 use App\Repository\UsuarioRepository;
+use App\Service\AuditoriaService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,6 +23,7 @@ class UsuarioController extends AbstractController
         private readonly RolRepository               $rolRepository,
         private readonly EntityManagerInterface      $entityManager,
         private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly AuditoriaService            $auditoriaService,
     )
     {
     }
@@ -115,6 +117,21 @@ class UsuarioController extends AbstractController
 
         $this->entityManager->persist($usuario);
         $this->entityManager->flush();
+
+        // Registrar en auditoría (sin exponer la contraseña)
+        $this->auditoriaService->registrar(
+            'CREATE',
+            'Usuario',
+            $usuario->getId(),
+            null,
+            [
+                'nombreCompleto' => $usuario->getNombreCompleto(),
+                'nombreUsuario' => $usuario->getNombreUsuario(),
+                'email' => $usuario->getEmail(),
+                'rol' => $rol->getNombre(),
+                'activo' => $usuario->isActivo(),
+            ]
+        );
 
         $this->addFlash('success', 'Usuario creado correctamente.');
         return $this->redirectToRoute('admin_usuarios_index');
