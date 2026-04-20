@@ -26,12 +26,14 @@
                     <select name="servicio" onchange="this.form.submit()"
                             class="appearance-none bg-surface-container-lowest border border-outline-variant/30 rounded-lg py-2.5 pl-4 pr-10 text-sm font-medium text-on-surface focus:ring-2 focus:ring-primary/20 transition-all">
                         {% for servicio in servicios %}
-                            <option value="{{ servicio.id }}" {{ servicioSeleccionado and servicio.id == servicioSeleccionado.id ? 'selected' : '' }}>
+                            <option
+                                value="{{ servicio.id }}" {{ servicioSeleccionado and servicio.id == servicioSeleccionado.id ? 'selected' : '' }}>
                                 {{ servicio.nombre }}
                             </option>
                         {% endfor %}
                     </select>
-                    <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+                    <span
+                        class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
                 </form>
                 {{ btn.primary('Nueva Configuración', 'add_circle') }}
             </div>
@@ -60,7 +62,8 @@
                     {# Días de la semana #}
                     <div class="grid grid-cols-7 gap-2 mb-3">
                         {% for dia in ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'] %}
-                            <div class="text-center text-xs font-semibold text-on-surface-variant uppercase tracking-wider py-1">
+                            <div
+                                class="text-center text-xs font-semibold text-on-surface-variant uppercase tracking-wider py-1">
                                 {{ dia }}
                             </div>
                         {% endfor %}
@@ -75,16 +78,19 @@
                                 {% set config = item.config %}
                                 {% set estadoClase = config ? (config.estado.value == 'ABIERTA' ? 'bg-green-100 border-green-300' : (config.estado.value == 'CERRADA' ? 'bg-error-container/30 border-error/30' : 'bg-surface-container-high border-outline-variant/30')) : 'bg-surface-container-low border-outline-variant/20' %}
                                 <div class="aspect-square p-1">
-                                    <div class="h-full rounded-lg border {{ estadoClase }} {{ item.esHoy ? 'ring-2 ring-primary ring-offset-1' : '' }} flex flex-col items-center justify-center relative hover:shadow-md transition-shadow cursor-pointer group"
-                                         onclick="alert('Día {{ item.dia }} - {{ config ? config.estado.value : 'Sin configuración' }}')">
-                                    <span class="text-sm font-medium {{ item.esHoy ? 'text-primary font-bold' : 'text-on-surface' }}">
-                                        {{ item.dia }}
-                                    </span>
+                                    <div
+                                        class="h-full rounded-lg border {{ estadoClase }} {{ item.esHoy ? 'ring-2 ring-primary ring-offset-1' : '' }} flex flex-col items-center justify-center relative hover:shadow-md transition-shadow cursor-pointer group"
+                                        onclick="{% if servicioSeleccionado %}window.location.href='{{ path('admin_calendario_configurar', {servicioId: servicioSeleccionado.id, fecha: item.fecha|date('Y-m-d')}) }}'{% else %}alert('Seleccione un servicio primero'){% endif %}">
+                    <span class="text-sm font-medium {{ item.esHoy ? 'text-primary font-bold' : 'text-on-surface' }}">
+                        {{ item.dia }}
+                    </span>
                                         {% if config %}
                                             <div class="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
-                                                <span class="w-1.5 h-1.5 rounded-full {{ config.estado.value == 'ABIERTA' ? 'bg-green-500' : (config.estado.value == 'CERRADA' ? 'bg-error' : 'bg-outline') }}"></span>
+                                                <span
+                                                    class="w-1.5 h-1.5 rounded-full {{ config.estado.value == 'ABIERTA' ? 'bg-green-500' : (config.estado.value == 'CERRADA' ? 'bg-error' : 'bg-outline') }}"></span>
                                             </div>
-                                            <div class="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-surface-container-high text-on-surface text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap z-10">
+                                            <div
+                                                class="hidden group-hover:block absolute -top-8 left-1/2 -translate-x-1/2 bg-surface-container-high text-on-surface text-xs px-2 py-1 rounded shadow-lg whitespace-nowrap z-10">
                                                 {{ config.estado.value }}<br>
                                                 Tickets: {{ config.ticketsRestantes }}/{{ config.ticketsGenerados }}
                                             </div>
@@ -125,11 +131,21 @@
                         <table class="w-full text-left text-sm">
                             <thead>
                             <tr class="bg-surface-container border-b border-outline-variant/20">
-                                <th class="py-3 pl-6 pr-4 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Fecha</th>
-                                <th class="py-3 px-4 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Monto Cargado</th>
-                                <th class="py-3 px-4 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Tickets</th>
-                                <th class="py-3 px-4 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Estado</th>
-                                <th class="py-3 pr-6 pl-4 text-xs font-semibold text-on-surface-variant uppercase tracking-wider text-right">Acciones</th>
+                                <th class="py-3 pl-6 pr-4 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                                    Fecha
+                                </th>
+                                <th class="py-3 px-4 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                                    Monto Cargado
+                                </th>
+                                <th class="py-3 px-4 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                                    Tickets
+                                </th>
+                                <th class="py-3 px-4 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                                    Estado
+                                </th>
+                                <th class="py-3 pr-6 pl-4 text-xs font-semibold text-on-surface-variant uppercase tracking-wider text-right">
+                                    Acciones
+                                </th>
                             </tr>
                             </thead>
                             <tbody>
@@ -138,31 +154,40 @@
                                     {% set config = item.config %}
                                     <tr class="group hover:bg-surface-container-low transition-colors duration-150">
                                         <td class="py-3 pl-6 pr-4 font-medium text-on-surface">{{ config.fecha|date('d/m/Y') }}</td>
-                                        <td class="py-3 px-4 text-on-surface-variant">$ {{ config.montoCargado|number_format(2) }}</td>
-                                        <td class="py-3 px-4 text-on-surface-variant">{{ config.ticketsRestantes }}/{{ config.ticketsGenerados }}</td>
+                                        <td class="py-3 px-4 text-on-surface-variant">
+                                            $ {{ config.montoCargado|number_format(2) }}</td>
+                                        <td class="py-3 px-4 text-on-surface-variant">{{ config.ticketsRestantes }}
+                                            /{{ config.ticketsGenerados }}</td>
                                         <td class="py-3 px-4">
                                             {% if config.estado.value == 'ABIERTA' %}
-                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium bg-green-100 text-green-800">
+                                                <span
+                                                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium bg-green-100 text-green-800">
                                                     <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Abierta
                                                 </span>
                                             {% elseif config.estado.value == 'CERRADA' %}
-                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium bg-error-container text-on-error-container">
+                                                <span
+                                                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium bg-error-container text-on-error-container">
                                                     <span class="w-1.5 h-1.5 rounded-full bg-error"></span> Cerrada
                                                 </span>
                                             {% else %}
-                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium bg-surface-container-high text-on-surface-variant">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-outline"></span> {{ config.estado.value }}
+                                                <span
+                                                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium bg-surface-container-high text-on-surface-variant">
+                                                    <span
+                                                        class="w-1.5 h-1.5 rounded-full bg-outline"></span> {{ config.estado.value }}
                                                 </span>
                                             {% endif %}
                                         </td>
                                         <td class="py-3 pr-6 pl-4 text-right">
-                                            <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div
+                                                class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 {{ btn.icon('edit', null, {title: 'Editar'}) }}
                                                 {{ btn.icon('visibility', null, {title: 'Ver'}) }}
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr><td class="h-px bg-surface-container-low" colspan="5"></td></tr>
+                                    <tr>
+                                        <td class="h-px bg-surface-container-low" colspan="5"></td>
+                                    </tr>
                                 {% endif %}
                             {% endfor %}
                             {% if diasDelMes|filter(i => i.config is defined and i.config) is empty %}
@@ -191,7 +216,8 @@
                         <div>
                             <h4 class="text-sm font-semibold text-on-surface mb-1">Capacidad Promedio (7 días)</h4>
                             <p class="text-xs text-on-surface-variant leading-relaxed">
-                                Promedio de <strong>{{ stats.promedioTickets }} tickets</strong> generados por día para este servicio.
+                                Promedio de <strong>{{ stats.promedioTickets }} tickets</strong> generados por día para
+                                este servicio.
                             </p>
                         </div>
                     </div>

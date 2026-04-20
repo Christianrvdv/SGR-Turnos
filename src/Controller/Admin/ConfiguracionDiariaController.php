@@ -3,6 +3,8 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\ConfiguracionDiaria;
+use App\Enum\EstadoConfiguracion;
 use App\Repository\ConfiguracionDiariaRepository;
 use App\Repository\ServicioRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,8 +18,9 @@ class ConfiguracionDiariaController extends AbstractController
 {
     public function __construct(
         private readonly ConfiguracionDiariaRepository $configuracionDiariaRepository,
-        private readonly ServicioRepository $servicioRepository,
-    ) {
+        private readonly ServicioRepository            $servicioRepository,
+    )
+    {
     }
 
     #[Route('/admin/calendario', name: 'admin_calendario_index')]
@@ -25,8 +28,8 @@ class ConfiguracionDiariaController extends AbstractController
     {
         // Obtener mes y año actual o de la solicitud
         $now = new \DateTime();
-        $mes = $request->query->getInt('mes', (int) $now->format('m'));
-        $anio = $request->query->getInt('anio', (int) $now->format('Y'));
+        $mes = $request->query->getInt('mes', (int)$now->format('m'));
+        $anio = $request->query->getInt('anio', (int)$now->format('Y'));
 
         $fechaInicio = new \DateTime("{$anio}-{$mes}-01");
         $fechaFin = clone $fechaInicio;
@@ -49,13 +52,13 @@ class ConfiguracionDiariaController extends AbstractController
 
         // Construir datos del calendario
         $diasDelMes = [];
-        $primerDia = (int) $fechaInicio->format('N'); // 1 (lunes) a 7 (domingo)
-        $totalDias = (int) $fechaFin->format('d');
+        $primerDia = (int)$fechaInicio->format('N'); // 1 (lunes) a 7 (domingo)
+        $totalDias = (int)$fechaFin->format('d');
 
         // Mapa de configuraciones por día
         $configPorDia = [];
         foreach ($configuraciones as $config) {
-            $dia = (int) $config->getFecha()->format('d');
+            $dia = (int)$config->getFecha()->format('d');
             $configPorDia[$dia] = $config;
         }
 
@@ -123,5 +126,43 @@ class ConfiguracionDiariaController extends AbstractController
             'promedioTickets' => count($configs) > 0 ? round($totalTickets / count($configs)) : 0,
             'totalConfiguraciones' => count($configs),
         ];
+    }
+
+    #[Route('/admin/calendario/configurar/{servicioId}/{fecha}', name: 'admin_calendario_configurar')]
+    public function configurar(int $servicioId, string $fecha, Request $request): Response
+    {
+        $servicio = $this->servicioRepository->find($servicioId);
+        if (!$servicio) {
+            throw $this->createNotFoundException('Servicio no encontrado');
+        }
+
+        $fechaObj = new \DateTime($fecha);
+
+        // Buscar configuración existente para esa fecha y servicio
+        $configuracion = $this->configuracionDiariaRepository->findOneBy([
+            'servicio' => $servicio,
+            'fecha' => $fechaObj
+        ]);
+
+        $esNueva = !$configuracion;
+        if ($esNueva) {
+            $configuracion = new ConfiguracionDiaria();
+            $configuracion->setServicio($servicio);
+            $configuracion->setFecha($fechaObj);
+            $configuracion->setEstado(EstadoConfiguracion::ABIERTA);
+        }
+
+        // Si es POST, procesar formulario (implementar más adelante)
+        if ($request->isMethod('POST')) {
+            // Procesar guardado...
+        }
+
+        return $this->render('admin/calendario/configurar.html.twig', [
+            'servicio' => $servicio,
+            'configuracion' => $configuracion,
+            'fecha' => $fechaObj,
+            'esNueva' => $esNueva,
+            'estados' => EstadoConfiguracion::cases(),
+        ]);
     }
 }
