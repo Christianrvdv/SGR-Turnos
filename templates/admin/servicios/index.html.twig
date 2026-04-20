@@ -13,7 +13,9 @@
                 <p class="text-lg text-on-surface-variant mt-2 font-medium">Administre los tipos de servicios ofrecidos
                     y sus configuraciones.</p>
             </div>
-            {{ btn.primary('Nuevo Servicio', 'add_circle') }}
+            {{ btn.primary('Nuevo Servicio', 'add_circle', null, {
+                'onclick': 'crearServicio()'
+            }) }}
         </div>
 
         {# Toolbar & Filter Section #}
@@ -116,7 +118,20 @@
                             <td class="py-4 pr-6 pl-4 text-right">
                                 <div
                                     class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    {{ btn.icon('edit', null, {title: 'Editar'}) }}
+                                    {# Botón Editar con llamada a editarServicio #}
+                                    {{ btn.icon('edit', null, {
+                                        title: 'Editar',
+                                        onclick: "editarServicio("
+                                        ~ servicio.id ~ ", "
+                                        ~ "'" ~ servicio.codigo|escape('js') ~ "', "
+                                        ~ "'" ~ servicio.nombre|escape('js') ~ "', "
+                                        ~ "'" ~ (servicio.descripcion|default(''))|escape('js') ~ "', "
+                                        ~ (servicio.permiteReservaFutura ? 'true' : 'false') ~ ", "
+                                        ~ (servicio.requiereControlFrecuencia ? 'true' : 'false') ~ ", "
+                                        ~ servicio.diasBloqueo ~ ", "
+                                        ~ (servicio.activo ? 'true' : 'false')
+                                        ~ ")"
+                                    }) }}
                                     {{ btn.icon('delete', null, {title: 'Eliminar', class: 'hover:text-error hover:bg-error-container'}) }}
                                 </div>
                             </td>
@@ -191,4 +206,177 @@
             </div>
         </div>
     </div>
+
+    {# ==================== MODAL CREAR/EDITAR SERVICIO ==================== #}
+    {% embed 'components/modal.html.twig' with {
+        id: 'modalServicio',
+        title: 'Nuevo Servicio',
+        size: '2xl'
+    } %}
+        {% import 'components/buttons.html.twig' as btn %}
+
+        {% block body %}
+            <form id="formServicio" method="post" action="{{ path('admin_servicios_create') }}" class="space-y-6">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('servicio_create') }}">
+                <input type="hidden" name="id" id="servicioId">
+
+                {# Fila 1: Código + Nombre #}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex flex-col">
+                        <label for="servicioCodigo"
+                               class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">
+                            Código <span class="text-error">*</span>
+                        </label>
+                        <input type="text" id="servicioCodigo" name="codigo" required maxlength="20"
+                               class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                               placeholder="Ej: CAJ-01">
+                        <p class="text-xs text-error mt-1 hidden error-message" data-field="codigo">Este campo es
+                            obligatorio</p>
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="servicioNombre"
+                               class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">
+                            Nombre <span class="text-error">*</span>
+                        </label>
+                        <input type="text" id="servicioNombre" name="nombre" required maxlength="100"
+                               class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                               placeholder="Ej: Caja General">
+                        <p class="text-xs text-error mt-1 hidden error-message" data-field="nombre">Este campo es
+                            obligatorio</p>
+                    </div>
+                </div>
+
+                {# Fila 2: Descripción #}
+                <div class="flex flex-col">
+                    <label for="servicioDescripcion"
+                           class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">Descripción</label>
+                    <textarea id="servicioDescripcion" name="descripcion" rows="2" maxlength="255"
+                              class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
+                              placeholder="Descripción opcional del servicio"></textarea>
+                </div>
+
+                {# Fila 3: Configuraciones con Toggles #}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    <div class="space-y-4">
+                        <label class="flex items-center gap-3 cursor-pointer group w-max">
+                            <div class="relative">
+                                <input type="checkbox" id="servicioPermiteReservaFutura" name="permiteReservaFutura"
+                                       checked class="sr-only peer">
+                                <div
+                                    class="w-11 h-6 bg-surface-container-high peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </div>
+                            <span
+                                class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">Permite Reserva Futura</span>
+                        </label>
+                        <label class="flex items-center gap-3 cursor-pointer group w-max">
+                            <div class="relative">
+                                <input type="checkbox" id="servicioRequiereControlFrecuencia"
+                                       name="requiereControlFrecuencia" checked class="sr-only peer">
+                                <div
+                                    class="w-11 h-6 bg-surface-container-high peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </div>
+                            <span
+                                class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">Requiere Control de Frecuencia</span>
+                        </label>
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="servicioDiasBloqueo"
+                               class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">Días
+                            de Bloqueo</label>
+                        <input type="number" id="servicioDiasBloqueo" name="diasBloqueo" min="0" max="365" value="7"
+                               class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg px-4 py-3 text-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all">
+                        <p class="text-xs text-on-surface-variant mt-1">0 = sin bloqueo</p>
+                    </div>
+                </div>
+
+                {# Fila 4: Estado Activo #}
+                <div class="flex flex-col h-full justify-center pt-2">
+                    <label class="flex items-center gap-3 cursor-pointer group w-max">
+                        <div class="relative">
+                            <input type="checkbox" id="servicioActivo" name="activo" checked class="sr-only peer">
+                            <div
+                                class="w-11 h-6 bg-surface-container-high peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </div>
+                        <span class="text-sm font-medium text-on-surface group-hover:text-primary transition-colors">Servicio Activo</span>
+                    </label>
+                </div>
+            </form>
+        {% endblock %}
+
+        {% block footer %}
+            <div class="flex items-center justify-end gap-4">
+                {{ btn.secondary('Cancelar', 'close', null, {
+                    'onclick': "closeModal('modalServicio')",
+                    'type': 'button'
+                }) }}
+                {{ btn.primary('Guardar Servicio', 'save', null, {
+                    'onclick': 'submitServicioForm()',
+                    'type': 'button'
+                }) }}
+            </div>
+        {% endblock %}
+    {% endembed %}
+    <script>
+        const modalServicio = document.getElementById('modalServicio');
+        const formServicio = document.getElementById('formServicio');
+        const modalTitle = document.querySelector('#modalServicio h2');
+
+        // Función para abrir modal en modo creación
+        window.crearServicio = function () {
+            modalTitle.textContent = 'Nuevo Servicio';
+            formServicio.action = '{{ path('admin_servicios_create') }}';
+            formServicio.reset();
+            document.getElementById('servicioId').value = '';
+            document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
+            openModal('modalServicio');
+        };
+
+        // Función para abrir modal en modo edición
+        window.editarServicio = function (id, codigo, nombre, descripcion, permiteReserva, requiereControl, diasBloqueo, activo) {
+            modalTitle.textContent = 'Editar Servicio';
+            formServicio.action = '{{ path('admin_servicios_update', {id: 'PLACEHOLDER'}) }}'.replace('PLACEHOLDER', id);
+            document.getElementById('servicioId').value = id;
+            document.getElementById('servicioCodigo').value = codigo;
+            document.getElementById('servicioNombre').value = nombre;
+            document.getElementById('servicioDescripcion').value = descripcion || '';
+            document.getElementById('servicioPermiteReservaFutura').checked = permiteReserva;
+            document.getElementById('servicioRequiereControlFrecuencia').checked = requiereControl;
+            document.getElementById('servicioDiasBloqueo').value = diasBloqueo;
+            document.getElementById('servicioActivo').checked = activo;
+            document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
+            openModal('modalServicio');
+        };
+
+        // Limpiar formulario al cerrar
+        modalServicio.addEventListener('modal-closed', function () {
+            formServicio.reset();
+            document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('input, select, textarea').forEach(el => {
+                el.classList.remove('border-error', 'ring-1', 'ring-error/15');
+            });
+        });
+
+        // Validación y envío
+        window.submitServicioForm = function () {
+            const required = ['servicioCodigo', 'servicioNombre'];
+            let isValid = true;
+
+            required.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                const error = document.querySelector(`[data-field="${fieldId.replace('servicio', '').toLowerCase()}"]`);
+                if (!field.value.trim()) {
+                    field.classList.add('border-error', 'ring-1', 'ring-error/15');
+                    if (error) error.classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    field.classList.remove('border-error', 'ring-1', 'ring-error/15');
+                    if (error) error.classList.add('hidden');
+                }
+            });
+
+            if (isValid) {
+                formServicio.submit();
+            }
+        };
+    </script>
 {% endblock %}
