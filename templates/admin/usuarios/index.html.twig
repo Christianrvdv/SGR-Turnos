@@ -14,7 +14,7 @@
                     plataforma.</p>
             </div>
             {{ btn.primary('Nuevo Usuario', 'person_add', null, {
-                'onclick': "openModal('modalCrearUsuario')"
+                'onclick': 'crearUsuario()'
             }) }}
         </div>
 
@@ -94,31 +94,61 @@
                             } %}
                             <span
                                 class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium {{ rolClase[rolNombre]|default('bg-surface-container-high text-on-surface-variant') }}">
-                    {{ rolNombre|replace({'ROLE_': ''})|capitalize }}
-                </span>
+                                {{ rolNombre|replace({'ROLE_': ''})|capitalize }}
+                            </span>
                         </td>
                         <td class="py-4 px-4">
                             {% if usuario.activo %}
                                 <span
                                     class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium bg-secondary-container text-on-secondary-container">
-                        Activo
-                    </span>
+                                    Activo
+                                </span>
                             {% else %}
                                 <span
                                     class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium bg-error-container text-on-error-container">
-                        Inactivo
-                    </span>
+                                    Inactivo
+                                </span>
                             {% endif %}
                         </td>
                         <td class="py-4 pr-6 pl-4 text-right">
                             <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                {{ btn.icon('edit', null, {title: 'Editar'}) }}
-                                {% if usuario.activo %}
-                                    {{ btn.icon('block', null, {title: 'Desactivar', class: 'hover:text-error hover:bg-error-container'}) }}
-                                {% else %}
-                                    {{ btn.icon('check_circle', null, {title: 'Activar'}) }}
-                                {% endif %}
-                                {{ btn.icon('delete', null, {title: 'Eliminar', class: 'hover:text-error hover:bg-error-container'}) }}
+                                {# Botón Editar #}
+                                {{ btn.icon('edit', null, {
+                                    title: 'Editar',
+                                    onclick: "editarUsuario("
+                                    ~ usuario.id ~ ", "
+                                    ~ "'" ~ usuario.nombreCompleto|escape('js') ~ "', "
+                                    ~ "'" ~ (usuario.email|default(''))|escape('js') ~ "', "
+                                    ~ (usuario.rol ? usuario.rol.id : 'null') ~ ", "
+                                    ~ (usuario.activo ? 'true' : 'false')
+                                    ~ ")"
+                                }) }}
+
+                                {# Formulario Activar/Desactivar #}
+                                <form method="post"
+                                      action="{{ path('admin_usuarios_toggle_activo', {id: usuario.id}) }}"
+                                      class="inline"
+                                      onsubmit="return confirm('¿Estás seguro de cambiar el estado de este usuario?')">
+                                    <input type="hidden" name="_csrf_token"
+                                           value="{{ csrf_token('usuario_toggle_' ~ usuario.id) }}">
+                                    <button type="submit" title="{{ usuario.activo ? 'Desactivar' : 'Activar' }}"
+                                            class="p-1.5 text-on-surface-variant hover:text-primary transition-colors rounded-lg hover:bg-surface-container-highest {{ usuario.activo ? 'hover:text-error hover:bg-error-container' : '' }}">
+                                        <span
+                                            class="material-symbols-outlined text-[20px]">{{ usuario.activo ? 'block' : 'check_circle' }}</span>
+                                    </button>
+                                </form>
+
+                                {# Formulario Eliminar #}
+                                <form method="post" action="{{ path('admin_usuarios_delete', {id: usuario.id}) }}"
+                                      class="inline"
+                                      onsubmit="return confirm('¿Estás seguro de eliminar este usuario? Esta acción no se puede deshacer.')">
+                                    <input type="hidden" name="_csrf_token"
+                                           value="{{ csrf_token('usuario_delete_' ~ usuario.id) }}">
+                                    <button type="submit" title="Eliminar"
+                                            class="p-1.5 text-on-surface-variant hover:text-error transition-colors rounded-lg hover:bg-error-container">
+                                        <span class="material-symbols-outlined text-[20px]">delete</span>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
@@ -138,16 +168,16 @@
                 </tbody>
             </table>
 
-            {# Pagination#}
+            {# Paginación #}
             <div
                 class="bg-surface-container-lowest px-6 py-4 border-t border-outline-variant/20 flex items-center justify-between">
-    <span class="text-sm text-on-surface-variant">
-        {% if totalUsuarios > 0 %}
-            Mostrando {{ ((currentPage - 1) * limit) + 1 }} a {{ min(currentPage * limit, totalUsuarios) }} de {{ totalUsuarios }} usuarios
-        {% else %}
-            No hay usuarios registrados
-        {% endif %}
-    </span>
+            <span class="text-sm text-on-surface-variant">
+                {% if totalUsuarios > 0 %}
+                    Mostrando {{ ((currentPage - 1) * limit) + 1 }} a {{ min(currentPage * limit, totalUsuarios) }} de {{ totalUsuarios }} usuarios
+                {% else %}
+                    No hay usuarios registrados
+                {% endif %}
+            </span>
                 <div class="flex items-center gap-1">
                     {% if currentPage > 1 %}
                         <a href="{{ path('admin_usuarios_index', {page: currentPage - 1, search: search}) }}"
@@ -160,7 +190,6 @@
                         </button>
                     {% endif %}
 
-                    {# Números de página con elipsis #}
                     {% for i in 1..totalPages %}
                         {% if i == currentPage %}
                             <span
@@ -190,18 +219,18 @@
         </div>
     </div>
 
-    {# ==================== MODAL CREAR USUARIO ==================== #}
+    {# ==================== MODAL CREAR/EDITAR USUARIO ==================== #}
     {% embed 'components/modal.html.twig' with {
         id: 'modalCrearUsuario',
         title: 'Crear Nuevo Usuario',
         size: '2xl'
     } %}
-        {# Importar botones dentro del embed para que estén disponibles #}
         {% import 'components/buttons.html.twig' as btn %}
 
         {% block body %}
-            <form id="formCrearUsuario" method="post" action="{{ path('admin_usuarios_create') }}" class="space-y-6">
+            <form id="formCrearUsuario" method="post" class="space-y-6">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('usuario_create') }}">
+                <input type="hidden" id="usuarioId" name="id">
 
                 {# Fila 1 #}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -240,7 +269,8 @@
                     </div>
                     <div class="flex flex-col">
                         <label for="password"
-                               class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2">
+                               class="text-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-2"
+                               id="passwordLabel">
                             Contraseña <span class="text-error">*</span>
                         </label>
                         <div class="relative">
@@ -310,9 +340,46 @@
     {% endembed %}
 
     <script>
-        // Limpiar formulario al cerrar modal
-        document.getElementById('modalCrearUsuario').addEventListener('modal-closed', function () {
-            document.getElementById('formCrearUsuario').reset();
+        const modal = document.getElementById('modalCrearUsuario');
+        const form = document.getElementById('formCrearUsuario');
+        const modalTitle = document.querySelector('#modalCrearUsuario h2');
+
+        // Función para abrir modal en modo creación
+        window.crearUsuario = function () {
+            modalTitle.textContent = 'Crear Nuevo Usuario';
+            form.action = '{{ path('admin_usuarios_create') }}';
+            form.reset();
+            document.getElementById('usuarioId').value = '';
+            document.getElementById('nombreUsuario').readOnly = false;
+            document.getElementById('nombreUsuario').classList.remove('bg-surface-container-low', 'opacity-70');
+            document.getElementById('password').required = true;
+            document.getElementById('passwordLabel').innerHTML = 'Contraseña <span class="text-error">*</span>';
+            document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
+            openModal('modalCrearUsuario');
+        };
+
+        // Función para abrir modal en modo edición
+        window.editarUsuario = function (id, nombreCompleto, email, rolId, activo) {
+            modalTitle.textContent = 'Editar Usuario';
+            form.action = '{{ path('admin_usuarios_update', {id: 'PLACEHOLDER'}) }}'.replace('PLACEHOLDER', id);
+            document.getElementById('usuarioId').value = id;
+            document.getElementById('nombreCompleto').value = nombreCompleto;
+            document.getElementById('email').value = email || '';
+            document.getElementById('rol').value = rolId;
+            document.getElementById('activo').checked = activo;
+            document.getElementById('nombreUsuario').value = '';
+            document.getElementById('nombreUsuario').readOnly = true;
+            document.getElementById('nombreUsuario').classList.add('bg-surface-container-low', 'opacity-70');
+            document.getElementById('password').value = '';
+            document.getElementById('password').required = false;
+            document.getElementById('passwordLabel').innerHTML = 'Contraseña <span class="optional-hint text-on-surface-variant font-normal">(opcional)</span>';
+            document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
+            openModal('modalCrearUsuario');
+        };
+
+        // Limpiar formulario al cerrar
+        modal.addEventListener('modal-closed', function () {
+            form.reset();
             document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('input, select').forEach(el => {
                 el.classList.remove('border-error', 'ring-1', 'ring-error/15');
@@ -334,8 +401,15 @@
 
         // Validación y envío del formulario
         window.submitForm = function () {
-            const form = document.getElementById('formCrearUsuario');
-            const required = ['nombreCompleto', 'nombreUsuario', 'password', 'rol'];
+            const required = ['nombreCompleto', 'rol'];
+            const nombreUsuarioField = document.getElementById('nombreUsuario');
+            const passwordField = document.getElementById('password');
+            const isEditing = document.getElementById('usuarioId').value !== '';
+
+            if (!isEditing) {
+                required.push('nombreUsuario', 'password');
+            }
+
             let isValid = true;
 
             required.forEach(fieldId => {
@@ -358,13 +432,21 @@
                 isValid = false;
             }
 
-            // Validación de longitud de contraseña
-            const password = document.getElementById('password');
-            if (password.value.length > 0 && password.value.length < 8) {
-                password.classList.add('border-error', 'ring-1', 'ring-error/15');
+            // Validación de contraseña (solo si se ingresa algo en edición o siempre en creación)
+            const password = passwordField.value;
+            if (password.length > 0 && password.length < 8) {
+                passwordField.classList.add('border-error', 'ring-1', 'ring-error/15');
                 const pwdError = document.querySelector('[data-field="password"]');
                 if (pwdError) {
                     pwdError.textContent = 'La contraseña debe tener al menos 8 caracteres';
+                    pwdError.classList.remove('hidden');
+                }
+                isValid = false;
+            } else if (!isEditing && password.length === 0) {
+                passwordField.classList.add('border-error', 'ring-1', 'ring-error/15');
+                const pwdError = document.querySelector('[data-field="password"]');
+                if (pwdError) {
+                    pwdError.textContent = 'La contraseña es obligatoria';
                     pwdError.classList.remove('hidden');
                 }
                 isValid = false;
