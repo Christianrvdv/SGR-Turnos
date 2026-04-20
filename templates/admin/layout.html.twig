@@ -62,15 +62,37 @@
         </a>
     </div>
     <div class="p-6 mt-auto">
-        <div
-            class="flex items-center gap-3 px-4 py-3 rounded-lg bg-surface-container-low cursor-pointer hover:bg-surface-container transition-colors">
-            <div
-                class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary-fixed-variant font-bold">
-                {{ app.user.nombreCompleto|slice(0,1)|upper }}
+        {# Área de usuario con menú desplegable #}
+        <div class="relative" id="userMenuContainer">
+            <div id="userMenuButton"
+                 class="flex items-center gap-3 px-4 py-3 rounded-lg bg-surface-container-low cursor-pointer hover:bg-surface-container transition-colors">
+                <div
+                    class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary-fixed-variant font-bold">
+                    {{ app.user.nombreCompleto|slice(0,1)|upper }}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold text-on-surface truncate">{{ app.user.nombreCompleto }}</p>
+                    <p class="text-xs text-on-surface-variant truncate">{{ app.user.email }}</p>
+                </div>
+                <span class="material-symbols-outlined text-on-surface-variant transition-transform" id="dropdownArrow">expand_more</span>
             </div>
-            <div class="flex-1 min-w-0">
-                <p class="text-sm font-semibold text-on-surface truncate">{{ app.user.nombreCompleto }}</p>
-                <p class="text-xs text-on-surface-variant truncate">{{ app.user.email }}</p>
+
+            {# Menú desplegable #}
+            <div id="userDropdown"
+                 class="absolute bottom-full left-0 w-full mb-2 bg-surface-container-lowest rounded-xl sunken-shadow border border-outline-variant/20 overflow-hidden hidden z-50">
+                <a href="#"
+                   class="flex items-center gap-3 px-4 py-3 text-sm text-on-surface-variant hover:bg-surface-container-low transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">settings</span>
+                    Configuración
+                </a>
+                <form action="{{ path('app_logout') }}" method="post" class="w-full">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                    <button type="submit"
+                            class="w-full flex items-center gap-3 px-4 py-3 text-sm text-error hover:bg-error-container/10 transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">logout</span>
+                        Cerrar sesión
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -113,6 +135,48 @@
 </main>
 
 <script>
+    // Manejo del menú desplegable del usuario
+    (function () {
+        const container = document.getElementById('userMenuContainer');
+        const button = document.getElementById('userMenuButton');
+        const dropdown = document.getElementById('userDropdown');
+        const arrow = document.getElementById('dropdownArrow');
+
+        if (!container || !button || !dropdown) return;
+
+        // Toggle menú
+        button.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const isHidden = dropdown.classList.contains('hidden');
+            dropdown.classList.toggle('hidden');
+            if (arrow) {
+                arrow.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+            }
+        });
+
+        // Cerrar al hacer clic fuera
+        document.addEventListener('click', function (e) {
+            if (!container.contains(e.target)) {
+                dropdown.classList.add('hidden');
+                if (arrow) arrow.style.transform = 'rotate(0deg)';
+            }
+        });
+
+        // Prevenir cierre al hacer clic dentro del dropdown
+        dropdown.addEventListener('click', function (e) {
+            e.stopPropagation();
+        });
+
+        // Cerrar con tecla Escape
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !dropdown.classList.contains('hidden')) {
+                dropdown.classList.add('hidden');
+                if (arrow) arrow.style.transform = 'rotate(0deg)';
+            }
+        });
+    })();
+
+    // Funciones globales para modales
     window.openModal = function (modalId) {
         const modal = document.getElementById(modalId);
         if (modal) {
