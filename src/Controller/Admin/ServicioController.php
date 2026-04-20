@@ -5,7 +5,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Servicio;
 use App\Repository\ServicioRepository;
-use App\Service\AuditoriaInterface;
+use App\Service\AuditoriaService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,11 +17,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ServicioController extends AbstractController
 {
     public function __construct(
-        private readonly ServicioRepository     $servicioRepository,
+        private readonly ServicioRepository $servicioRepository,
         private readonly EntityManagerInterface $entityManager,
-        private readonly AuditoriaInterface     $auditoriaService,
-    )
-    {
+        private readonly AuditoriaService $auditoriaService,
+    ) {
     }
 
     #[Route('/admin/servicios', name: 'admin_servicios_index')]
@@ -50,12 +49,12 @@ class ServicioController extends AbstractController
         $totalPages = (int)ceil($totalServicios / $limit);
 
         return $this->render('admin/servicios/index.html.twig', [
-            'servicios' => $servicios,
-            'currentPage' => $page,
-            'totalPages' => $totalPages,
-            'totalServicios' => $totalServicios,
-            'search' => $search,
-            'limit' => $limit,
+            'servicios'       => $servicios,
+            'currentPage'     => $page,
+            'totalPages'      => $totalPages,
+            'totalServicios'  => $totalServicios,
+            'search'          => $search,
+            'limit'           => $limit,
         ]);
     }
 
@@ -101,20 +100,19 @@ class ServicioController extends AbstractController
         $this->entityManager->persist($servicio);
         $this->entityManager->flush();
 
-        // Registrar en auditoría
         $this->auditoriaService->registrar(
             'CREATE',
             'Servicio',
             $servicio->getId(),
             null,
             [
-                'codigo' => $servicio->getCodigo(),
-                'nombre' => $servicio->getNombre(),
-                'descripcion' => $servicio->getDescripcion(),
-                'permiteReservaFutura' => $servicio->isPermiteReservaFutura(),
-                'requiereControlFrecuencia' => $servicio->isRequiereControlFrecuencia(),
-                'diasBloqueo' => $servicio->getDiasBloqueo(),
-                'activo' => $servicio->isActivo(),
+                'codigo'                  => $servicio->getCodigo(),
+                'nombre'                  => $servicio->getNombre(),
+                'descripcion'             => $servicio->getDescripcion(),
+                'permiteReservaFutura'    => $servicio->isPermiteReservaFutura(),
+                'requiereControlFrecuencia'=> $servicio->isRequiereControlFrecuencia(),
+                'diasBloqueo'             => $servicio->getDiasBloqueo(),
+                'activo'                  => $servicio->isActivo(),
             ]
         );
 
@@ -139,15 +137,14 @@ class ServicioController extends AbstractController
             return $this->redirectToRoute('admin_servicios_index');
         }
 
-        // Guardar datos antes del cambio
         $datosAntes = [
-            'codigo' => $servicio->getCodigo(),
-            'nombre' => $servicio->getNombre(),
-            'descripcion' => $servicio->getDescripcion(),
-            'permiteReservaFutura' => $servicio->isPermiteReservaFutura(),
-            'requiereControlFrecuencia' => $servicio->isRequiereControlFrecuencia(),
-            'diasBloqueo' => $servicio->getDiasBloqueo(),
-            'activo' => $servicio->isActivo(),
+            'codigo'                  => $servicio->getCodigo(),
+            'nombre'                  => $servicio->getNombre(),
+            'descripcion'             => $servicio->getDescripcion(),
+            'permiteReservaFutura'    => $servicio->isPermiteReservaFutura(),
+            'requiereControlFrecuencia'=> $servicio->isRequiereControlFrecuencia(),
+            'diasBloqueo'             => $servicio->getDiasBloqueo(),
+            'activo'                  => $servicio->isActivo(),
         ];
 
         $codigo = trim($request->request->get('codigo', ''));
@@ -180,24 +177,99 @@ class ServicioController extends AbstractController
 
         $this->entityManager->flush();
 
-        // Registrar en auditoría
         $this->auditoriaService->registrar(
             'UPDATE',
             'Servicio',
             $servicio->getId(),
             $datosAntes,
             [
-                'codigo' => $servicio->getCodigo(),
-                'nombre' => $servicio->getNombre(),
-                'descripcion' => $servicio->getDescripcion(),
-                'permiteReservaFutura' => $servicio->isPermiteReservaFutura(),
-                'requiereControlFrecuencia' => $servicio->isRequiereControlFrecuencia(),
-                'diasBloqueo' => $servicio->getDiasBloqueo(),
-                'activo' => $servicio->isActivo(),
+                'codigo'                  => $servicio->getCodigo(),
+                'nombre'                  => $servicio->getNombre(),
+                'descripcion'             => $servicio->getDescripcion(),
+                'permiteReservaFutura'    => $servicio->isPermiteReservaFutura(),
+                'requiereControlFrecuencia'=> $servicio->isRequiereControlFrecuencia(),
+                'diasBloqueo'             => $servicio->getDiasBloqueo(),
+                'activo'                  => $servicio->isActivo(),
             ]
         );
 
         $this->addFlash('success', 'Servicio actualizado correctamente.');
+        return $this->redirectToRoute('admin_servicios_index');
+    }
+
+    #[Route('/admin/servicios/{id}/toggle-activo', name: 'admin_servicios_toggle_activo', methods: ['POST'])]
+    public function toggleActivo(int $id, Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $servicio = $this->servicioRepository->find($id);
+        if (!$servicio) {
+            $this->addFlash('error', 'Servicio no encontrado.');
+            return $this->redirectToRoute('admin_servicios_index');
+        }
+
+        $submittedToken = $request->request->get('_csrf_token');
+        if (!$this->isCsrfTokenValid('servicio_toggle_' . $id, $submittedToken)) {
+            $this->addFlash('error', 'Token CSRF inválido.');
+            return $this->redirectToRoute('admin_servicios_index');
+        }
+
+        $estadoAnterior = $servicio->isActivo();
+        $servicio->setActivo(!$estadoAnterior);
+        $servicio->setActualizadoEn(new \DateTime());
+        $this->entityManager->flush();
+
+        $this->auditoriaService->registrar(
+            $servicio->isActivo() ? 'ACTIVAR' : 'DESACTIVAR',
+            'Servicio',
+            $servicio->getId(),
+            ['activo' => $estadoAnterior],
+            ['activo' => $servicio->isActivo()]
+        );
+
+        $this->addFlash('success', $servicio->isActivo() ? 'Servicio activado correctamente.' : 'Servicio desactivado correctamente.');
+        return $this->redirectToRoute('admin_servicios_index');
+    }
+
+    #[Route('/admin/servicios/{id}/eliminar', name: 'admin_servicios_delete', methods: ['POST'])]
+    public function delete(int $id, Request $request): Response
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
+        $servicio = $this->servicioRepository->find($id);
+        if (!$servicio) {
+            $this->addFlash('error', 'Servicio no encontrado.');
+            return $this->redirectToRoute('admin_servicios_index');
+        }
+
+        $submittedToken = $request->request->get('_csrf_token');
+        if (!$this->isCsrfTokenValid('servicio_delete_' . $id, $submittedToken)) {
+            $this->addFlash('error', 'Token CSRF inválido.');
+            return $this->redirectToRoute('admin_servicios_index');
+        }
+
+        $datosServicio = [
+            'codigo'                  => $servicio->getCodigo(),
+            'nombre'                  => $servicio->getNombre(),
+            'descripcion'             => $servicio->getDescripcion(),
+            'permiteReservaFutura'    => $servicio->isPermiteReservaFutura(),
+            'requiereControlFrecuencia'=> $servicio->isRequiereControlFrecuencia(),
+            'diasBloqueo'             => $servicio->getDiasBloqueo(),
+            'activo'                  => $servicio->isActivo(),
+        ];
+
+        $this->entityManager->remove($servicio);
+        $this->entityManager->flush();
+
+        $this->auditoriaService->registrar(
+            'DELETE',
+            'Servicio',
+            $id,
+            $datosServicio,
+            null
+        );
+
+        $this->addFlash('success', 'Servicio eliminado correctamente.');
         return $this->redirectToRoute('admin_servicios_index');
     }
 }

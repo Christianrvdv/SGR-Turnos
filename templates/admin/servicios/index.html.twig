@@ -23,13 +23,9 @@
             <form method="get" class="relative w-96">
                 <span
                     class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ search }}"
-                    class="w-full bg-surface-container-low border-none rounded-lg py-3 pl-10 pr-4 text-sm text-on-surface placeholder:text-outline-variant focus:ring-2 focus:ring-primary/20 transition-shadow"
-                    placeholder="Filtrar por código, nombre o descripción"
-                >
+                <input type="text" name="search" value="{{ search }}"
+                       class="w-full bg-surface-container-low border-none rounded-lg py-3 pl-10 pr-4 text-sm text-on-surface placeholder:text-outline-variant focus:ring-2 focus:ring-primary/20 transition-shadow"
+                       placeholder="Filtrar por código, nombre o descripción">
                 {% if search %}
                     <a href="{{ path('admin_servicios_index') }}"
                        class="absolute right-3 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface">
@@ -106,19 +102,19 @@
                                 {% if servicio.activo %}
                                     <span
                                         class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium bg-green-100 text-green-800">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Activo
-                    </span>
+                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Activo
+                                    </span>
                                 {% else %}
                                     <span
                                         class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-medium bg-surface-container-high text-on-surface-variant">
-                        <span class="w-1.5 h-1.5 rounded-full bg-outline"></span> Inactivo
-                    </span>
+                                        <span class="w-1.5 h-1.5 rounded-full bg-outline"></span> Inactivo
+                                    </span>
                                 {% endif %}
                             </td>
                             <td class="py-4 pr-6 pl-4 text-right">
                                 <div
                                     class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    {# Botón Editar con llamada a editarServicio #}
+                                    {# Botón Editar #}
                                     {{ btn.icon('edit', null, {
                                         title: 'Editar',
                                         onclick: "editarServicio("
@@ -132,7 +128,32 @@
                                         ~ (servicio.activo ? 'true' : 'false')
                                         ~ ")"
                                     }) }}
-                                    {{ btn.icon('delete', null, {title: 'Eliminar', class: 'hover:text-error hover:bg-error-container'}) }}
+
+                                    {# Formulario Activar/Desactivar #}
+                                    <form method="post"
+                                          action="{{ path('admin_servicios_toggle_activo', {id: servicio.id}) }}"
+                                          class="inline"
+                                          onsubmit="return confirm('¿Estás seguro de cambiar el estado de este servicio?')">
+                                        <input type="hidden" name="_csrf_token"
+                                               value="{{ csrf_token('servicio_toggle_' ~ servicio.id) }}">
+                                        <button type="submit" title="{{ servicio.activo ? 'Desactivar' : 'Activar' }}"
+                                                class="p-1.5 text-on-surface-variant hover:text-primary transition-colors rounded-lg hover:bg-surface-container-highest {{ servicio.activo ? 'hover:text-error hover:bg-error-container' : '' }}">
+                                            <span
+                                                class="material-symbols-outlined text-[20px]">{{ servicio.activo ? 'block' : 'check_circle' }}</span>
+                                        </button>
+                                    </form>
+
+                                    {# Formulario Eliminar #}
+                                    <form method="post" action="{{ path('admin_servicios_delete', {id: servicio.id}) }}"
+                                          class="inline"
+                                          onsubmit="return confirm('¿Estás seguro de eliminar este servicio? Esta acción no se puede deshacer.')">
+                                        <input type="hidden" name="_csrf_token"
+                                               value="{{ csrf_token('servicio_delete_' ~ servicio.id) }}">
+                                        <button type="submit" title="Eliminar"
+                                                class="p-1.5 text-on-surface-variant hover:text-error transition-colors rounded-lg hover:bg-error-container">
+                                            <span class="material-symbols-outlined text-[20px]">delete</span>
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -163,20 +184,19 @@
                     No hay servicios registrados
                 {% endif %}
             </span>
-                <div class="flex gap-2">
+                <div class="flex items-center gap-1">
                     {% if currentPage > 1 %}
                         <a href="{{ path('admin_servicios_index', {page: currentPage - 1, search: search}) }}"
-                           class="px-3 py-1.5 text-sm font-medium text-on-surface-variant bg-surface-container-low rounded-lg hover:bg-surface-container-high transition-colors">
-                            Anterior
+                           class="p-2 rounded-full hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined text-[20px]">chevron_left</span>
                         </a>
                     {% else %}
-                        <button disabled
-                                class="px-3 py-1.5 text-sm font-medium text-on-surface-variant/50 bg-surface-container-low rounded-lg cursor-not-allowed">
-                            Anterior
+                        <button disabled class="p-2 rounded-full text-outline/50 cursor-not-allowed">
+                            <span class="material-symbols-outlined text-[20px]">chevron_left</span>
                         </button>
                     {% endif %}
 
-                    {# Números de página simplificados #}
+                    {# Números de página con elipsis #}
                     {% for i in 1..totalPages %}
                         {% if i == currentPage %}
                             <span
@@ -193,13 +213,12 @@
 
                     {% if currentPage < totalPages %}
                         <a href="{{ path('admin_servicios_index', {page: currentPage + 1, search: search}) }}"
-                           class="px-3 py-1.5 text-sm font-medium text-on-surface bg-surface-container-low rounded-lg hover:bg-surface-container-high transition-colors">
-                            Siguiente
+                           class="p-2 rounded-full hover:bg-surface-container-low text-on-surface-variant hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined text-[20px]">chevron_right</span>
                         </a>
                     {% else %}
-                        <button disabled
-                                class="px-3 py-1.5 text-sm font-medium text-on-surface-variant/50 bg-surface-container-low rounded-lg cursor-not-allowed">
-                            Siguiente
+                        <button disabled class="p-2 rounded-full text-outline/50 cursor-not-allowed">
+                            <span class="material-symbols-outlined text-[20px]">chevron_right</span>
                         </button>
                     {% endif %}
                 </div>
@@ -316,6 +335,7 @@
             </div>
         {% endblock %}
     {% endembed %}
+
     <script>
         const modalServicio = document.getElementById('modalServicio');
         const formServicio = document.getElementById('formServicio');
